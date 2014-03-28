@@ -554,7 +554,7 @@ W3Ex.ibaengine = (function($){
 			state.ondisappear = $('#ondisappeartype').val();
 			state.ondisappeareasing = $('#ondisappeareasing option:selected').val();
 			state.ondisappearspeed = $('#ondisappearspeed').val();
-			state.staticeffect = $('#laststateeffect option:selected').val();
+			state.staticeffect = "none";
 		}
 		
 		if(bsorting)
@@ -1656,7 +1656,7 @@ W3Ex.ibaengine = (function($){
 		AnimItem.ondis =  stateitem.ondisappear;
 		AnimItem.ondiseasing =  stateitem.ondisappeareasing;
 		AnimItem.ondisspeed =   parseInt(stateitem.ondisappearspeed,10);
-		AnimItem.staticeffect =  stateitem.staticeffect;
+		AnimItem.staticeffect =  "none";
 		
 		var layer = _previewob.layer;
 		if(layer.width < AnimItem.width)
