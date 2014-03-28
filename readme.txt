@@ -43,3 +43,4 @@ Upload the Image Banner Effects Lite plugin to your blog and activate it.
 1. Click this menu to access the plugin
 2. Plugin's visual editor
 3. Stlye editor
+4. Images list
