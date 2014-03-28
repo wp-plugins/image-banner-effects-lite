@@ -28,6 +28,7 @@ Features:
  - Handy layer preview accessible with a single click.
 
 
+[Effects Demo](http://www.w3examples.com/myblog/sdf/)
 
 Howtos with screenshots
 [Plugin Howtos](http://www.w3examples.com/wordpress/image_banner_effects.php)
