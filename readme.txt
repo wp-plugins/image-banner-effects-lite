@@ -9,10 +9,10 @@ Contributors: GeorgeIron
 Stable Tag: trunk
 License: GPLv2 or later
 
-Add animations to your images.
+Add text animations to your images.
 
 == Description ==
-Highlight the images of your products or services with layered, multi-state animations.
+Highlight the images of your products or services with layered, multi-state text animations.
 Mobile friendly css3 animations and responsive layers. The user interface is very intuitive
 to work with and will get you started in minutes.
 
