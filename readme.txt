@@ -33,6 +33,8 @@ Features:
 Howtos with screenshots
 [Plugin Howtos](http://www.w3examples.com/wordpress/image_banner_effects.php)
 
+[youtube https://www.youtube.com/watch?v=HGaMEfizpcg]
+
 == Installation ==
 Upload the Image Banner Effects Lite plugin to your blog and activate it.
 
