@@ -88,7 +88,7 @@ class W3ExImageBannerMain {
 		wp_enqueue_style('w3exibe-adminboot',$purl.'css/bootstrap-cust.css',false, '1.0', 'all' );
 		wp_enqueue_style('w3exibe-clienteffects',$purl.'css/ibeffects-client.css',false, '1.0', 'all' );
 		wp_enqueue_style('w3exibe-admincss',$purl.'css/admin.css',false, '1.0', 'all' );
-		wp_enqueue_script('w3exibe_adminjs', $purl . 'js/admin-lite-min.js',  array(), '1.0.0', true );
+		wp_enqueue_script('w3exibe_adminjs', $purl . 'js/admin-lite.js',  array(), '1.0.0', true );
 		wp_enqueue_style('w3exibe-spect',$purl.'css/spectrum.css',false, '1.0', 'all' );
 		wp_enqueue_script('w3exibe-jqspect',$purl.'js/spectrum.js', array(), '1.0', true );
 		wp_localize_script('w3exibe_adminjs', 'W3ExIBA', array(
@@ -103,7 +103,7 @@ class W3ExImageBannerMain {
 	{
 		$purl = plugin_dir_url(__FILE__);
 		wp_enqueue_style('w3exibe-clienteffects',$purl.'css/ibeffects-client.css',false, '1.0', 'all' );
-		wp_enqueue_script('w3exibe-jseffects', $purl . 'js/clienteffects-lite-min.js', array('jquery'), '1.0.0', true );
+		wp_enqueue_script('w3exibe-jseffects', $purl . 'js/clienteffects-lite.js', array('jquery'), '1.0.0', true );
 	}
 	
 	public static function generate_shortcode($atts,$content=NULL )
