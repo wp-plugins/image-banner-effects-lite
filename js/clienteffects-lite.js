@@ -138,10 +138,7 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						top:(anim.top-_animOffset) + 'px'
 					});
-					if(_notmodern)
-						props.top = anim.top+'px';
-					else
-						props.y = _animOffset+'px';
+					props.top = anim.top+'px';
 					props.opacity =  1;
 				}
 					break;
@@ -150,11 +147,7 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						left:(anim.left-_animOffset) + 'px'
 					});
-					
-					if(_notmodern)
-						props.left = anim.left+'px';
-					else
-						props.x = _animOffset+'px';
+					props.left = anim.left+'px';
 					props.opacity =  1;
 				}
 					break;
@@ -163,15 +156,10 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						left:(anim.left+_animOffset) + 'px'
 					});
-					props.x = '-'+_animOffset+'px';
-					if(_notmodern)
-					{
-						props.left = anim.left+'px';
-						$elem.css({
-							'height':anim.height+'px'
-						});
-					}
-						
+					props.left = anim.left+'px';
+					$elem.css({
+						'height':anim.height+'px'
+					});
 					props.opacity =  1;
 				}
 					break;
@@ -180,9 +168,7 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						top:(anim.top+_animOffset) + 'px'
 					});
-					props.y = '-'+_animOffset+'px';
-					if(_notmodern)
-						props.top = anim.top+'px';
+					props.top = anim.top+'px';
 					props.opacity =  1;
 				}
 					break;
@@ -191,6 +177,12 @@ W3Ex.ibaengine = (function($){
 			}
 		}else if(anim.state.finish)
 		{
+			$elem.css({
+				top:anim.top+'px',
+				left:anim.left+'px',
+				transition:'',
+				transform:''
+			});
 			props.duration = anim.ondisspeed;
 			props.easing = anim.ondiseasing;
 			
@@ -202,43 +194,27 @@ W3Ex.ibaengine = (function($){
 					break;
 				case "top":
 				{
-					
-					if(_notmodern)
-						props.top = (anim.top-_animOffset)+'px';
-					else
-						props.y = '-'+_animOffset+'px';
+					props.top = (anim.top-_animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "left":
 				{
-					
-					if(_notmodern)
-						props.left = (anim.left-_animOffset)+'px';
-					else
-						props.x = '-'+_animOffset+'px';
+					props.left = (anim.left-_animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "right":
 				{
-					if(_notmodern)
-					{
-						props.left = (anim.left+_animOffset)+'px';
-					}
-					else
-						props.x = _animOffset+'px';
+					props.left = (anim.left+_animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "bottom":
 				{
-					if(_notmodern)
-						props.top = (anim.top+_animOffset)+'px';
-					else
-						props.y = _animOffset+'px';
+					props.top = (anim.top+_animOffset)+'px';
 					props.opacity = 0;
-				}
+				}break;
 				case "none":
 				{
 					props.duration = 10;

@@ -1458,7 +1458,7 @@ W3Ex.ibaengine = (function($){
 			switch(anim.onappear){
 				case "fadein":
 				{
-					props.opacity = 0.9999;//show
+					props.opacity = 1;//show
 				}
 					break;
 				case "top":
@@ -1466,8 +1466,8 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						top:(anim.top-_animOffset) + 'px'
 					});
-					props.y = _animOffset+'px';
-					props.opacity = 0.9999;
+					props.top = anim.top+'px';
+					props.opacity =  1;
 				}
 					break;
 				case "left":
@@ -1475,8 +1475,8 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						left:(anim.left-_animOffset) + 'px'
 					});
-					props.x = _animOffset+'px';
-					props.opacity = 0.9999;
+					props.left = anim.left+'px';
+					props.opacity =  1;
 				}
 					break;
 				case "right":
@@ -1484,8 +1484,11 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						left:(anim.left+_animOffset) + 'px'
 					});
-					props.x = '-'+_animOffset+'px';
-					props.opacity = 0.9999;
+					props.left = anim.left+'px';
+					$elem.css({
+						'height':anim.height+'px'
+					});
+					props.opacity =  1;
 				}
 					break;
 				case "bottom":
@@ -1493,8 +1496,8 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						top:(anim.top+_animOffset) + 'px'
 					});
-					props.y = '-'+_animOffset+'px';
-					props.opacity = 0.9999;
+					props.top = anim.top+'px';
+					props.opacity =  1;
 				}
 					break;
 				default:
@@ -1502,8 +1505,15 @@ W3Ex.ibaengine = (function($){
 			}
 		}else if(anim.state.finish)
 		{
+			$elem.css({
+				top:anim.top+'px',
+				left:anim.left+'px',
+				transition:'',
+				transform:''
+			});
 			props.duration = anim.ondisspeed;
 			props.easing = anim.ondiseasing;
+			
 			switch(anim.ondis){
 				case "fadeout":
 				{
@@ -1512,27 +1522,27 @@ W3Ex.ibaengine = (function($){
 					break;
 				case "top":
 				{
-					props.y = '-'+_animOffset+'px';
+					props.top = (anim.top-_animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "left":
 				{
-					props.x = '-'+_animOffset+'px';
+					props.left = (anim.left-_animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "right":
 				{
-					props.x = _animOffset+'px';
+					props.left = (anim.left+_animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "bottom":
 				{
-					props.y = _animOffset+'px';
+					props.top = (anim.top+_animOffset)+'px';
 					props.opacity = 0;
-				}
+				}break;
 				case "none":
 				{
 					props.duration = 10;
@@ -1542,6 +1552,7 @@ W3Ex.ibaengine = (function($){
 				default:
 					break;
 			}
+			
 		}
 		
 		if(anim.state.firstshow)
