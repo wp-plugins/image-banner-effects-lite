@@ -17,16 +17,16 @@ Mobile friendly css3 animations and responsive layers. The user interface is ver
 to work with and will get you started in minutes.
 
 Features:
- - *New* Create standalone layers without images.
- - *New* Attach an animated layer to any html element by ID.
- - Fully responsive css3 animations.
- - Default to pure jQuery animations in older browsers /IE8-IE9/.
- - Full control of state display time and animation effect duration.
- - Sortable states.
- - Handy style editor with live preview.
- - Save and easily manage different styles.
- - Choose between 5 entry animations and 5 leave animations.
- - Handy layer preview accessible with a single click.
+ * **New** Create standalone layers without images.
+ * **New** Attach an animated layer to any html element by ID.
+ * Fully responsive css3 animations.
+ * Default to pure jQuery animations in older browsers /IE8-IE9/.
+ * Full control of state display time and animation effect duration.
+ * Sortable states.
+ * Handy style editor with live preview.
+ * Save and easily manage different styles.
+ * Choose between 5 entry animations and 5 leave animations.
+ * Handy layer preview accessible with a single click.
 
 
 [Effects Demo](http://www.w3examples.com/myblog/sdf/)
@@ -40,6 +40,7 @@ Howtos with screenshots
 Upload the Image Banner Effects Lite plugin to your blog and activate it.
 
 == Changelog ==
+
 = 1.1 =
 * Standalone layers
 * Attached layer to element ID
