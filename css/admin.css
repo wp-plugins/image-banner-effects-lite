@@ -1,8 +1,20 @@
-.w3_ibainnerhold {
-	position: relative;
-	left:0px;
-	top:0px;
-	overflow:hidden;
+#placeholder {
+	margin-top:30px;
+	margin-left:30px;
+/*	display: none;*/
+}
+
+#placeholder button{
+	width:50px;
+}
+
+#applyoffset{
+/*	margin-right:30px;*/
+}
+
+#leftrightdiv, #topbottomdiv
+{
+	display: inline-block;
 }
 .w3_effect{
   	-moz-box-sizing: border-box;
@@ -23,12 +35,14 @@
 }
 #showdialog {
     display: none;
-	height:650px;
 	font-size: 12px;
 	padding:23px 0px;
+/*	margin-top:20px;*/
 }
 
 #slider-font-size{
+/*	font-size: 22px;*/
+/*	line-height: 21px;*/
 	width:350px;	
 }
 #font-size{
@@ -45,6 +59,8 @@
 
 #slider-radius-size
 {
+/*	font-size: 22px;*/
+/*	line-height: 21px;*/
 	width:250px;	
 }
 #radius-size, #padding-size{
@@ -58,10 +74,14 @@
 	background: no-repeat;
 	background-image:url('../images/transparentback.png');
 	background-position:center; 
+/*	width:455px;*/
 	width:auto;
 	height:auto;
+/*	height: 132px;*/
 	text-align: center;
 	vertical-align: middle;
+/*	margin-top:170px;*/
+/*	line-height: 132px; */
 	display: inline;
 }
 
@@ -82,6 +102,10 @@
 }
 
 #backtoimages{
+	/*padding-bottom: 5px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;	*/
 	padding:5px 8px;
 	text-decoration: none;
 }
@@ -90,6 +114,7 @@
 	position: absolute;
 	top: 40px;
 	left:265px;
+/*	visibility: hidden;*/
 	display: none;
 }
 
@@ -102,6 +127,7 @@
 	display: inline-block;
 	z-index: 30002;
 	position: absolute;
+/*	float: left;*/
 	top:5px;
 	left:30px;
 }
@@ -178,17 +204,21 @@
 	height: 95px;
    overflow: hidden;
    padding-left: 30px;
+/*   clear: both;*/
    display: block;
 }
 #showimages td,#showimages th{
    text-align: center;
    vertical-align: middle;
+   border-bottom: 1px solid #E1E1E1;
+/*   padding-top:40px;*/
 }
 #showimages img{
 	position: relative;
 	top: -20px;
 	left:0;
 	height: 150px; width: 150px;
+/*	clip: rect(0px,0px,120px,0px);*/
 }
 
 #showimages div {
@@ -234,9 +264,14 @@
 	position: absolute;
 	min-height: 20px;
 	min-width: 40px;
+/*	width:100px;*/
 	top:20px;left:30px;
 	border:dotted 1px grey;
+/*	line-height: 70px;  */
+	
 }
+
+
 
 .defaultstyle{
 	background:black;
@@ -326,10 +361,48 @@ div#laststate{
 }
 
 
+
+
+/*body, #wpbody, .form-table .pre, .ui-autocomplete li a {
+    color: #444444;
+}
+body {
+    font-family: "Open Sans",sans-serif;
+    font-size: 11px;
+    line-height: 1.4em;
+    min-width: 600px;
+}*/
 .toggler { width: 500px; height: 200px; position: relative; }
 #button { padding: .5em 1em; text-decoration: none; }
 #effect { width: 240px; padding: 1em; font-size: 1.2em; border: 1px solid #000; background: #eee; color: #333; opacity: 1;}
+/*.newClass { text-indent: 40px; opacity: 0.5; width: 410px; height: 100px; padding: 30px; margin: 10px; font-size: 1.6em; }*/
 .w3c_wrap{-moz-box-sizing: border-box;position: relative;overflow: hidden;line-height: normal;display: inline-block;}
+.w3c_wrap_element{
+ 	-moz-box-sizing:border-box;
+	position: relative;
+	overflow: hidden;
+	line-height: normal;
+	display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.defaultlayer_element{
+	min-height: 20px;
+	min-width: 40px;
+/*	top:20px;left:30px;*/
+	border:dotted 1px grey;
+	display: inline-block;	
+	position:relative;
+}
+
+.w3_ibainnerhold {
+	position: relative;
+	left:0px;
+	top:0px;
+	overflow:hidden;
+}
+
 .w3c_inner{position: relative;overflow: hidden;}
 .w3c_inneff{position: absolute;top:0px;left:0px;}
 .texttest{position: absolute;top:0px;left:0px;color:white;font-size: 20px;}

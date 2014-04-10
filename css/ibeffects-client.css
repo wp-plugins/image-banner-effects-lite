@@ -5,15 +5,31 @@
 	display: inline-block;    
 }
 
-.w3_ibacontainer{
+.w3ibe_layer{
 	line-height:normal; 
 }
 
 .w3_effect{
+/*	white-space: nowrap;*/
   	-moz-box-sizing: border-box;
   	box-sizing: border-box;
 	-webkit-backface-visibility: hidden;
 	-webkit-transition: translate3d(0,0,0);
+	-webkit-transform: translateZ(0);
+	-webkit-font-smoothing: antialiased;
+	white-space: nowrap;
+/*  word-wrap: break-word; /* IE */*/
+}
+
+.w3c_wrap_element{
+ 	-moz-box-sizing:border-box;
+/*	border: 1px black solid;*/
+	position: relative;
+/*	overflow: hidden;*/
+	line-height: normal;
+	white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
 }
 
 /*!
@@ -29,14 +45,14 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-.w3_ibacontainer .animated {
+.w3ibe_layer .animated {
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
 
-.w3_ibacontainer .animated.hinge {
+.w3ibe_layer .animated.hinge {
   -webkit-animation-duration: 2s;
   animation-duration: 2s;
 }
@@ -78,7 +94,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .bounce {
+.w3ibe_layer .bounce {
   -webkit-animation-name: w3_ibabounce;
   animation-name: w3_ibabounce;
 }
@@ -103,7 +119,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .flash {
+.w3ibe_layer .flash {
   -webkit-animation-name: w3_ibaflash;
   animation-name: w3_ibaflash;
 }
@@ -147,7 +163,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .pulse {
+.w3ibe_layer .pulse {
   -webkit-animation-name: w3_ibapulse;
   animation-name: w3_ibapulse;
 }
@@ -211,7 +227,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .rubber {
+.w3ibe_layer .rubber {
   -webkit-animation-name: w3_ibarubberBand;
   animation-name: w3_ibarubberBand;
 }
@@ -253,7 +269,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .shake {
+.w3ibe_layer .shake {
   -webkit-animation-name: w3_ibashake;
   animation-name: w3_ibashake;
 }
@@ -317,7 +333,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .swing {
+.w3ibe_layer .swing {
   -webkit-transform-origin: top center;
   -ms-transform-origin: top center;
   transform-origin: top center;
@@ -384,7 +400,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .tada {
+.w3ibe_layer .tada {
   -webkit-animation-name: w3_ibatada;
   animation-name: w3_ibatada;
 }
@@ -472,7 +488,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 }
 
-.w3_ibacontainer .wobble {
+.w3ibe_layer .wobble {
   -webkit-animation-name: w3_ibawobble;
   animation-name: w3_ibawobble;
 }
