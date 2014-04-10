@@ -56,10 +56,370 @@ W3Ex.ibaengine = (function($){
 	var _statestyle = {};
 	var _imagesizeshtml = "";
 	var _animOffset = 40;
+	var _iselement = false;
 	var _previewob = {};
 	_previewob.ispreview = false;
 	_previewob.counter = 0;
 	
+	$('#aelementid').keyup(function(){
+       $('#elementerror').html('');
+    });
+	
+	$('#newplaceholder').click(function ()
+	{
+		$('#placeholder').dialog("open");
+	})
+	$('input:radio[name=radiop]').click(function ()
+	{
+		$('#elementerror').html('');
+	})
+	//placement buttons
+		$('#Top-left').click(function ()
+		{
+			$('#elementplacement').text("Top-left");
+			$('#elementerror').html('');
+		})
+		$('#Top-middle').click(function ()
+		{
+			$('#elementplacement').text("Top-middle");
+			$('#elementerror').html('');
+		})
+		$('#Top-right').click(function ()
+		{
+			$('#elementplacement').text("Top-right");
+			$('#elementerror').html('');
+		})
+		$('#Mid-left').click(function ()
+		{
+			$('#elementplacement').text("Mid-left");
+			$('#elementerror').html('');
+		})
+		$('#Mid-middle').click(function ()
+		{
+			$('#elementplacement').text("Center");
+			$('#elementerror').html('');
+		})
+		$('#Mid-right').click(function ()
+		{
+			$('#elementplacement').text("Mid-right");
+			$('#elementerror').html('');
+		})
+		$('#Bot-left').click(function ()
+		{
+			$('#elementplacement').text("Bot-left");
+			$('#elementerror').html('');
+		})
+		$('#Bot-middle').click(function ()
+		{
+			$('#elementplacement').text("Bot-middle");
+			$('#elementerror').html('');
+		})
+		$('#Bot-right').click(function ()
+		{
+			$('#elementplacement').text("Bot-right");
+			$('#elementerror').html('');
+		})
+		
+	$(document).on( "click",'.layersettings', function ()
+	{
+	 	
+		var $elem = $(this);
+		W3Ex.currcontainer = true;
+		W3Ex.clickedelem = $elem;
+		$('#placeholder').dialog("open");
+	})
+	
+	$('#applyoffset').click(function()
+	{
+		var ischecked = $(this).prop('checked');
+		if(ischecked)
+		{
+			$('#leftrightdiv').show();
+			$('#topbottomdiv').show();
+		}else
+		{
+			$('#leftrightdiv').hide();
+			$('#topbottomdiv').hide();
+		}
+	})
+	
+	//end placement buttons
+	$("#placeholder").dialog({			
+	            autoOpen: false,
+	            height: 420,
+	            width: 520,
+	            modal: true,
+				draggable:false,
+				resizable:false,
+				closeOnEscape: false,
+				open: function( event, ui ) {
+					 var d = $('.ui-dialog:visible');
+					 $(d).css('z-index',300002);
+					  $('.ui-widget-overlay').each(function () {
+	   					 $(this).next('.ui-dialog').andSelf().wrapAll('<div class="w3exvtfscope w3exvtfdel" />');
+				});
+					$('span.ui-icon-closethick').css({
+													   left : '0px',
+													   top : '0px'
+													});
+				$('input:radio[name=radiop]').each(function () { $(this).prop('checked', false); });	
+				$('#elementplacement').text("");
+				$('#aelementid').val('');
+				$('#elementerror').html('');
+				$('#placeholder').css('height','342px');
+				$('#applyoffset').prop('checked',false);
+				$('#leftrightdiv').hide();
+				$('#topbottomdiv').hide();
+				$('#leftrightper').val('0');
+				$('#leftrightleft').prop('checked','checked');
+				$('#topbottomper').val('0');
+				$('#topbottomtop').prop('checked','checked');
+				$('#p0').prop('checked','checked');
+				if(W3Ex.currcontainer != undefined && W3Ex.currcontainer)
+				{
+					var id = W3Ex.clickedelem.attr('data-id');
+					
+					for(var i = 0; i < W3Ex.containers.length; i++){
+						var container = W3Ex.containers[i];
+						if(container == undefined) continue;
+						if(container.id != id) continue;
+						
+						if((container.standalone !== true) && (container.standalone !== false))
+						{
+							if(container.standalone == "true")
+							{
+								container.standalone = true;
+							}else
+							{
+								container.standalone = false;
+							}
+						}
+						if(container.standalone)
+						{
+							$('#p0').prop('checked','checked');
+						}else
+						{
+							$('#p1').prop('checked','checked');
+							$('#aelementid').val(container.elemid);
+							$('#elementplacement').text(container.elemposition);
+							if((container.ifoffset !== true) && (container.ifoffset !== false))
+							{
+								if(container.ifoffset == "true")
+								{
+									container.ifoffset = true;
+								}else
+								{
+									container.ifoffset = false;
+								}
+							}
+							if(container.ifoffset)
+							{
+								$('#applyoffset').prop('checked',true);
+								$('#leftrightdiv').show();
+								$('#topbottomdiv').show();
+								$('#leftrightper').val(container.leftrightp);
+								$('#' +container.leftrightd).prop('checked','checked');
+								$('#topbottomper').val(container.topbottomp);
+								$('#' +container.topbottomd).prop('checked','checked');
+							}
+						}
+					}	
+				}
+			},
+			close: function( event, ui ) {
+				W3Ex.currcontainer = false;
+			},
+   			 buttons: {
+              "OK": function() {
+			  
+			  	var selid = $('input[name=radiop]:checked').attr('id');
+				var elemid = $('#aelementid').val();
+				var elemposition = $('#elementplacement').text();
+				if(selid != undefined)
+				{
+					if(selid != 'p0')
+					{
+						if(isBlank(elemid))
+						 {
+							$('#elementerror').html('<div class="ui-widget">' +
+						    '<div class="ui-state-error ui-corner-all" style="padding: 5px;">' +
+								'Enter element ID' +
+						        '</div></div>');
+							return;
+						 }
+						
+						 if(isBlank(elemposition))
+						 {
+							$('#elementerror').html('<div class="ui-widget">' +
+						    '<div class="ui-state-error ui-corner-all" style="padding: 5px;">' +
+								'Select element position' +
+						        '</div></div>');
+							return;
+						 }	
+					}
+				}else
+				{
+					$('#elementerror').html('<div class="ui-widget">' +
+					    '<div class="ui-state-error ui-corner-all" style="padding: 5px;">' +
+							'Select layer style' +
+					        '</div></div>');
+					return;
+				}
+				var $elem = $('.ui-dialog-buttonset > .ui-button').first();
+        		$elem.addClass('disabled').css('position','relative').append('<div class="showajax"></div>');
+				var data = {};
+				if(selid == 'p0')
+				{
+					data.standalone = true;
+				}else
+				{
+					data.standalone = false;
+					data.elemid = elemid;
+					data.elemposition = elemposition;
+					data.ifoffset = $('#applyoffset').prop('checked');
+					if(data.ifoffset)
+					{
+						data.leftrightp = $('#leftrightper').val();
+						var sellr = $('input[name=leftright]:checked').attr('id');
+						data.leftrightd = sellr;
+						data.topbottomp = $('#topbottomper').val();
+						var sellt = $('input[name=topbottom]:checked').attr('id');
+						data.topbottomd = sellt;
+					}
+				}
+				if(W3Ex.currcontainer != undefined && W3Ex.currcontainer)
+				{
+					var id = W3Ex.clickedelem.attr('data-id');
+					data.id = id;
+					for(var i = 0; i < W3Ex.containers.length; i++){
+						var container = W3Ex.containers[i];
+						if(container == undefined) continue;
+						if(container.id != id) continue;
+						container.standalone = data.standalone;
+						if(!container.standalone )
+						{
+							container.elemid = data.elemid;
+							container.elemposition = data.elemposition;
+							container.ifoffset = data.ifoffset;
+							if(container.ifoffset)
+							{
+								container.leftrightp = data.leftrightp;
+								container.leftrightd = data.leftrightd;
+								container.topbottomp = data.topbottomp
+								container.topbottomd = data.topbottomd;
+							}
+						}
+					}
+					var newimg = {};
+					newimg.action = 'ibeffects_ajax_request';
+					newimg.type = 'updateelement';
+					newimg.nonce = W3ExIBA.nonce;
+					newimg.data = data;
+					var dlg = $(this);
+					var $clickedelem = W3Ex.clickedelem;
+					jQuery.ajax({
+				         type : "post",
+				         dataType : "json",
+				         url : W3ExIBA.ajaxurl,
+				         data : newimg,
+				         success: function(response) {
+						 	$elem.removeClass('disabled').css('position','static');
+						   	$elem.find('.showajax').remove();
+							var eleminfo = '<br>type: placeholder';
+							if(data.standalone)
+							{
+								eleminfo+= '<br>sub-type: standalone';
+							}else
+							{
+								eleminfo = 'type: placeholder';
+								eleminfo+= '<br>sub-type: attached';
+								eleminfo+= '<br>to element: '+ data.elemid;
+								eleminfo+= '<br>position: '+ data.elemposition;
+							}
+							$clickedelem.closest(".centerblock").find(".shownimages").html(eleminfo);
+							dlg.dialog( "close" );
+				         },
+						 
+				      }) ; 
+				}else
+				{
+					
+					var newimg = {};
+					newimg.action = 'ibeffects_ajax_request';
+					newimg.type = 'newelement';
+					newimg.nonce = W3ExIBA.nonce;
+					newimg.data = data;
+					var dlg = $(this);
+					jQuery.ajax({
+				         type : "post",
+				         dataType : "json",
+				         url : W3ExIBA.ajaxurl,
+				         data : newimg,
+				         success: function(response) {
+						 	$elem.removeClass('disabled').css('position','static');
+						   	$elem.find('.showajax').remove();
+							var eleminfo = '<br>type: placeholder';
+							if(data.standalone)
+							{
+								eleminfo+= '<br>sub-type: standalone';
+							}else
+							{
+								eleminfo = 'type: placeholder';
+								eleminfo+= '<br>sub-type: attached';
+								eleminfo+= '<br>to element: '+ data.elemid;
+								eleminfo+= '<br>position: '+ data.elemposition;
+							}
+						 	var html =  '<tr>' +
+							'<td >' +response.id.id+ '</td>'+
+							'<td >'+response.id.shortcode+'</td>' +
+							'<td ><div style="text-align:left;">'+response.id.infoto+'</div></td>' +
+							'<td style="padding-top:2px;padding-bottom:6px;"><div class="centerblock">' +
+							'<div class="imagebuttons">' +
+								'<a class="btn btn-success btn-sm editlayer" href="admin.php?page=ibeffects&edit='+response.id.id+'">' +
+								'<span class="glyphicon glyphicon-pencil"></span>' +
+								'&nbsp;Edit</a>' +
+								'<button data-id="'+response.id.id+'" class="btn btn-info btn-sm layersettings" style="margin-top:6px;margin-bottom:6px;">'+
+					 					'<span class="glyphicon glyphicon-cog"></span>'+
+									'&nbsp;Settings</button>	' +
+									'<button data-id="'+response.id.id+'" class="btn btn-danger btn-sm deletelayer">'+
+					 					'<span class="glyphicon glyphicon-trash"></span>'+
+									'&nbsp;Delete</button>	'+
+							'</div>'+
+							 '<div class="shownimages" style="text-align:left;padding-left:40px;">'+ eleminfo + '</div><div style="clear:both;"> </div></div></td></tr>';
+							$('#showimages > tbody:last').append(html);
+							W3Ex.containers = W3Ex.containers || [];
+							var newcontainer = {};
+							newcontainer.id = response.id.id;
+							newcontainer.standalone = data.standalone;
+							if(!newcontainer.standalone )
+							{
+								newcontainer.elemid = data.elemid;
+								newcontainer.elemposition = data.elemposition;
+								newcontainer.ifoffset = data.ifoffset;
+								if(newcontainer.ifoffset)
+								{
+									newcontainer.leftrightp = data.leftrightp;
+									newcontainer.leftrightd = data.leftrightd;
+									newcontainer.topbottomp = data.topbottomp
+									newcontainer.topbottomd = data.topbottomd;
+								}
+							}
+							W3Ex.containers.push(newcontainer);
+							dlg.dialog( "close" );
+				         },
+						 
+				      }) ; 
+					 }
+				 
+				
+              },
+              Cancel: function()
+			  {
+				  $( this ).dialog( "close" );
+              }
+            }
+		});
+		
 	$(_buts.previewlayer).click(function ()
 	{	
 		if(_selected.layer == -1) return;
@@ -92,6 +452,8 @@ W3Ex.ibaengine = (function($){
 			layer.width = 0;
 			layer.height = 0;
 			_previewob.layer = layer;	
+			if(_iselement)
+				$_sellayer.hide();
 			for(var i = 0; i < _Data.layers.items.length; i++)
 			{
 				var layer = _Data.layers.items[i];
@@ -110,8 +472,11 @@ W3Ex.ibaengine = (function($){
 			' Preview Layer</button>');
 			$(this).removeClass('btn-warning').addClass('btn-success');
 			$('#maindiv').show();
-			$(_buts.deletelayer).removeAttr("disabled");
-			$(_buts.newlayer).removeAttr("disabled");
+			if(!_iselement)
+			{
+				$(_buts.deletelayer).removeAttr("disabled");
+				$(_buts.newlayer).removeAttr("disabled");
+			}
 			_previewob.ispreview = false;
 			
 			
@@ -130,6 +495,8 @@ W3Ex.ibaengine = (function($){
 			myNode.innerHTML = '';
 			_arrEffects.splice(0, _arrEffects.length);
 			$('#w3_previewlayer').remove();
+			if(_iselement)
+				$_sellayer.show();
 			for(var i = 0; i < _Data.layers.items.length; i++)
 			{
 				var layer = _Data.layers.items[i];
@@ -148,6 +515,11 @@ W3Ex.ibaengine = (function($){
 	{
 		if(type == "layer")
 		{
+			if(_iselement)
+			{
+				$(_buts.deletelayer).attr("disabled","disabled");
+				$(_buts.newlayer).attr("disabled","disabled");
+			}
 			if(_selected.layer == -1)
 			{
 				$(_buts.newtext).attr("disabled","disabled");
@@ -160,6 +532,7 @@ W3Ex.ibaengine = (function($){
 					$(_buts.previewlayer).attr("disabled","disabled");
 				else
 					$(_buts.previewlayer).removeAttr("disabled");
+				if(!_iselement)
 				$(_buts.deletelayer).removeAttr("disabled");
 			}
 		}
@@ -426,6 +799,13 @@ W3Ex.ibaengine = (function($){
 				$("#font-color-value").val(style.fontcolor);
 				$fontexample.css('color',style.fontcolor);
 				$fontexample.css('font-size',style.fontsize + "px");
+				if(style.ifbackground){
+					if(style.ifbackground == "false"){
+						style.ifbackground = false;
+					}
+					if(style.backcolor == undefined)
+						style.ifbackground = false;
+				}
 				if(style.ifbackground)
 				{
 					$('#ifbackground').prop('checked',true);
@@ -490,6 +870,13 @@ W3Ex.ibaengine = (function($){
 				if(statesort.sortid == i)
 				{
 					var label = "Text State";
+					if(statesort.type == "html")
+					{
+						label = "Html State";
+					}else if(statesort.type == "image")
+					{
+						label = "Image State";
+					}
 					var newl = '<li data-id="' + statesort.stateid + '" class="ui-state-highlight layerstate">' +label+ '<button class="btn btn-danger btn-sm" type="button" title="Delete State">' +
 					'<span class="glyphicon glyphicon-trash"></span>' +
 					'</button></li>';
@@ -513,6 +900,8 @@ W3Ex.ibaengine = (function($){
 
 	$(document).on( "click",'div.imagelayer', function() 
 	{
+		if(_iselement)
+			return;
 		var clickedid = $(this).attr('data-id');
 		if(_selected.layer == clickedid || _previewob.ispreview)
 		   return;
@@ -544,7 +933,12 @@ W3Ex.ibaengine = (function($){
 		var state = GetState(layerid,stateid);
 		if(_selected.state != -1)
 		{//not preview, save
+			if(state.type == "text"){
 			state.text = $('#statecontent').val();
+			}else if(state.type == "html")
+			{
+				state.html = $('#statecontentdiv').html();
+			}
 			state.displayfor = $('#displaystate').val();
 			state.delayfor =  $('#delaystate').val();
 			state.afterfin = $('#laststatefin option:selected').val();
@@ -631,6 +1025,7 @@ W3Ex.ibaengine = (function($){
 		newstate.stateid = stateid;
 		newstate.type = "text";
 		newstate.text = "";
+		newstate.html = "";
 		_Data.states.items.push(newstate);
 		return newstate;
 	}
@@ -673,16 +1068,20 @@ W3Ex.ibaengine = (function($){
 			}).disableSelection();
 			$( "#statesettings" ).tabs();
  			$( "#statesettings" ).tabs().hide();
-			UpdateUI("layer");
 			_Styles.items = [];
 			GenerateLayers();
 			if(_Data.layers == undefined)
 			{
 				_Data.layers = {};
 				_Data.layers.items = [];
+				
+			}
+			if(_Data.states == undefined)
+			{
 				_Data.states = {};
 				_Data.states.items = [];
 			}
+			UpdateUI("layer");
 			PopulateStyles();
 			var $fontexample = $('#fontexample');
 			 $( "#slider-font-size" ).slider({
@@ -747,7 +1146,7 @@ W3Ex.ibaengine = (function($){
 					$("#back-color").spectrum({
 						color:backcolor,
 						className: "full-spectrum",
-						appendTo: "#showdialog",
+						appendTo: "#dialogstyles",
 						showPalette: true,
 						showInput: true,
 						showSelectionPalette: true,
@@ -759,7 +1158,7 @@ W3Ex.ibaengine = (function($){
 					$("#font-color").spectrum({
 						color:fontcolor,
 						className: "full-spectrum",
-						appendTo: "#showdialog",
+						appendTo: "#dialogstyles",
 						showPalette: true,
 						showInput: true,
 						showSelectionPalette: true,
@@ -834,7 +1233,6 @@ W3Ex.ibaengine = (function($){
 						$('#ifbackground').prop('checked',false);
 						$("#divifbackground").css('visibility','hidden');
 					}
-//					$('#showdialog').css('height','540px');
 			},
 			close: function( event, ui ) {
 				
@@ -888,7 +1286,30 @@ W3Ex.ibaengine = (function($){
 		
 	function GenerateLayers()
 	{
-		if(W3Ex.imagearrlayers != undefined)
+		
+		if(W3Ex.iselement != undefined)
+		{
+			_iselement = true;
+			$(_buts.deletelayer).attr("disabled","disabled");
+			$(_buts.newlayer).attr("disabled","disabled");
+			_selected.layer = 0;
+			$_sellayer = $('.layer');
+			var newlayer = {};
+			newlayer.id = 0;
+			_Data.layers = {};
+			_Data.layers.items = [];
+			_Data.layers.items.push(newlayer);
+			if(W3Ex.imagearrlayers != undefined)
+			{
+				_Data.states = {};
+				_Data.states.items = [];
+				if(W3Ex.imagearrlayers.states != undefined)
+				{
+					_Data.states = W3Ex.imagearrlayers.states;
+					UpdateStates();
+				}
+			}
+		}else if(W3Ex.imagearrlayers != undefined)
 		{
 			_Data = W3Ex.imagearrlayers;
 			if(_Data.layers != undefined)
@@ -985,6 +1406,8 @@ W3Ex.ibaengine = (function($){
 	 	var ajaxarr = {};
 		ajaxarr.action = 'ibeffects_ajax_request';
 		ajaxarr.type = 'savechanges';
+		if(_iselement)
+			ajaxarr.type = 'saveelementchanges';
 		ajaxarr.nonce = W3ExIBA.nonce;
 		var data = {};
 		data.id  = W3Ex.imageid;
@@ -1085,15 +1508,22 @@ W3Ex.ibaengine = (function($){
 		if(layerid == -1 || stateid == -1)
 			return;
 		var state = GetState(layerid,stateid);
-		$('#changestyle').removeAttr("disabled");
-		$('#contenttype').text("Text");
-		$('#statecontentdiv').removeClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
-		$('#statecontentdiv').hide();
-		$('#editcontent').hide();
-		$('#statecontent').show();
-		$('#statecontent').val(state.text.replace(new RegExp('<br />','g'), '\n'));
-		state.text = state.text.replace(new RegExp('\n','g'), '<br />');
-	    $_sellayer.html(state.text);
+//		if(state.type == "text")
+		{
+			$('#changestyle').removeAttr("disabled");
+			$('#contenttype').text("Text");
+			$('#statecontentdiv').removeClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
+			$('#statecontentdiv').hide();
+			$('#editcontent').hide();
+			$('#statecontent').show();
+			state.text = state.text.replace(new RegExp('\n','g'), '<br />');
+			state.text = state.text.replace(/\\\\/g, '@@@@@');
+			state.text = state.text.replace(/\\/g, '');
+			state.text = state.text.replace(/@@@@@/g, '\\');
+			$('#statecontent').val(state.text);
+		    $_sellayer.html(state.text);
+		}
+		
 		$_sellayer.removeClass('defaultstyle');
 		if(isDefined(state.style))
 		{
@@ -1173,7 +1603,8 @@ W3Ex.ibaengine = (function($){
 	function ShowDefaultState(type)
 	{
 		$_sellayer.html("");
-		if(type == "text"){
+//		if(type == "text")
+		{
 			$('#contenttype').text("Text");
 			$('#statecontentdiv').removeClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
 			$('#statecontentdiv').hide();
@@ -1236,6 +1667,7 @@ W3Ex.ibaengine = (function($){
     });
 	
 	
+	
 
 	(function ()
 	 {
@@ -1261,8 +1693,6 @@ W3Ex.ibaengine = (function($){
 			state.type = "text";
 			ShowDefaultState("text");
 		});
-		
-	
 		
 		Init();
 	 })();
@@ -1305,6 +1735,7 @@ W3Ex.ibaengine = (function($){
 	})
 	
 	
+	
 	var custom_uploader;
 	
 	$('#newimage').click(function(e){
@@ -1341,7 +1772,6 @@ W3Ex.ibaengine = (function($){
 				if(img == _u) continue;
 				if(key == "thumbnail")
 					backimg = img.url;
-//				alert(key+'\n'+img.url +'\nwidth:' +img.width+'\nheight:'+img.height);
 				html+= '<input type="radio" id="'+counter+'" name="radioi"><label for="' +counter+'"> ';
 				html+= ( key.charAt(0).toUpperCase() + key.slice(1)) + ' - ( width: ' + img.width + ' ) ( height: ' +img.height + ' )</label> <br/>';
 				_arrimgs[counter] = img.url;
@@ -1432,9 +1862,11 @@ W3Ex.ibaengine = (function($){
 		_arrEffects.push(AnimItem);
 	}
 	
+	
 	function animateSingleItem(anim)
 	{
 		var props = {};
+		var propssecond = {};
 		var $elem = anim.domitem;
 		props.duration = anim.onappspeed;
 		props.complete = animationFinish;
@@ -1443,7 +1875,6 @@ W3Ex.ibaengine = (function($){
 		var leftwidth = Math.round(width/2);
 		var height = anim.height;
 		var topheight = Math.round(height/2);
-		
 		if(anim.state.start && !anim.state.finish)
 		{
 			props.easing = anim.onappeasing;
@@ -1467,7 +1898,7 @@ W3Ex.ibaengine = (function($){
 						top:(anim.top-_animOffset) + 'px'
 					});
 					props.top = anim.top+'px';
-					props.opacity =  1;
+					props.opacity = 1;
 				}
 					break;
 				case "left":
@@ -1476,7 +1907,7 @@ W3Ex.ibaengine = (function($){
 						left:(anim.left-_animOffset) + 'px'
 					});
 					props.left = anim.left+'px';
-					props.opacity =  1;
+					props.opacity = 1;
 				}
 					break;
 				case "right":
@@ -1484,11 +1915,13 @@ W3Ex.ibaengine = (function($){
 					$elem.css({
 						left:(anim.left+_animOffset) + 'px'
 					});
-					props.left = anim.left+'px';
-					$elem.css({
-						'height':anim.height+'px'
-					});
-					props.opacity =  1;
+					{
+						props.left = anim.left+'px';
+						$elem.css({
+							'height':anim.height+'px'
+						});
+					}
+					props.opacity = 1;
 				}
 					break;
 				case "bottom":
@@ -1497,7 +1930,7 @@ W3Ex.ibaengine = (function($){
 						top:(anim.top+_animOffset) + 'px'
 					});
 					props.top = anim.top+'px';
-					props.opacity =  1;
+					props.opacity = 1;
 				}
 					break;
 				default:
@@ -1505,54 +1938,48 @@ W3Ex.ibaengine = (function($){
 			}
 		}else if(anim.state.finish)
 		{
+			props.duration = anim.ondisspeed;
+			props.easing = anim.ondiseasing;
 			$elem.css({
 				top:anim.top+'px',
 				left:anim.left+'px',
 				transition:'',
 				transform:''
-			});
-			props.duration = anim.ondisspeed;
-			props.easing = anim.ondiseasing;
+				});
 			
 			switch(anim.ondis){
 				case "fadeout":
 				{
 					props.opacity = 0;//show
-				}
-					break;
+				}break;
 				case "top":
 				{
 					props.top = (anim.top-_animOffset)+'px';
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				case "left":
 				{
 					props.left = (anim.left-_animOffset)+'px';
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				case "right":
 				{
 					props.left = (anim.left+_animOffset)+'px';
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				case "bottom":
 				{
-					props.top = (anim.top+_animOffset)+'px';
+					props.top = (anim.top + _animOffset)+'px';
 					props.opacity = 0;
 				}break;
 				case "none":
 				{
 					props.duration = 10;
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				default:
 					break;
 			}
-			
 		}
 		
 		if(anim.state.firstshow)
@@ -1568,10 +1995,13 @@ W3Ex.ibaengine = (function($){
 			if(anim.state.finish)
 			{
 				props.delay = anim.displayfor;
+				propssecond.delay = anim.displayfor;
 				$elem.transition(props);
+				
 			}else
 			{
 				props.delay = 0;
+				propssecond.delay = 0;
 				$elem.transition(props);
 			}
 		}
@@ -1607,12 +2037,16 @@ W3Ex.ibaengine = (function($){
 					{
 						if(AnimItem.afterfin == "stop")
 							return;
+						if(AnimItem.afterfin != "loop")
+						{//apply static effect
+							var $elem = AnimItem.domitem;
+							return;
+						}
 					}
 					animateSingleItem(AnimItem);
 				}else if(AnimItem.state.finish)
 				{//check for next state
 					var $elem = AnimItem.domitem;
-					
 					$elem.css({
 						top:AnimItem.top+'px',
 						left:AnimItem.left+'px',
@@ -1680,9 +2114,10 @@ W3Ex.ibaengine = (function($){
 		}
 		$elem.css({
 			'position':'absolute',
-			'display':'inline',
+			'display':'inline-block',
 			'width':AnimItem.width+'px',
-			'height':AnimItem.height+'px'
+			'height':AnimItem.height+'px',
+			'padding-right':'0px'
 			});
 		return AnimItem;
 	}
@@ -1695,6 +2130,8 @@ W3Ex.ibaengine = (function($){
 		 	_animOffset = parseInt($mainimg.width() * 0.14,10);
 		 else
 		 	_animOffset = parseInt($mainimg.height() * 0.14,10);
+		if(_iselement)
+			_animOffset = 40;
 		var arrstates = _previewob.arrstates;
 		for(var i=0; i<arrstates.length;i++)
 		{
@@ -1703,13 +2140,43 @@ W3Ex.ibaengine = (function($){
 		}
 		
 		layer.domitem.removeClass('w3_ibainnerhold');
-		layer.domitem.css({
-			position:'absolute',
-			top:layer.top,
-			left:layer.left,
-			width:layer.width,
-			height:layer.height
-		})
+		if(_iselement)
+		{
+			layer.domitem.css({
+				position:'relative',
+				display:'inline-block',
+				width:layer.width,
+				height:layer.height
+			})
+		}else
+		{
+			layer.domitem.css({
+				position:'absolute',
+				top:layer.top,
+				left:layer.left,
+				width:layer.width,
+				height:layer.height
+			})
+		}
+		
+		for(var k = 0; k < _arrEffects.length; k++)
+		{
+			var anim = _arrEffects[k];
+			if(_iselement)
+				anim.domitem.css('visibility','hidden');
+			if(anim.height > layer.height)
+			{
+				layer.domitem.css({
+					height:anim.height
+				})
+			}
+			if(anim.width > layer.width)
+			{
+				layer.domitem.css({
+					width:anim.width,
+				})
+			}
+		}
 		
 		for(var j = 0; j < _arrEffects.length; j++)
 		{
@@ -1750,8 +2217,17 @@ W3Ex.ibaengine = (function($){
 		var counteffitem = 0;
 		_arrEffects.length = 0;
 		_previewob.counter++;
-		$('<div id="w3_previewlayer" class="w3_ibainnerhold"></div>').appendTo($('#w3_ibacontainer0'));
-		_previewob.layer.domitem = $('#w3_previewlayer');
+		if(_iselement)
+		{
+			$('<div id="w3_previewlayer"></div>').appendTo($('.w3c_wrap_element'));
+			_previewob.layer.domitem = $('#w3_previewlayer');
+//			_previewob.layer.domitem = $('.w3c_wrap_element');
+		}else
+		{
+			$('<div id="w3_previewlayer" class="w3_ibainnerhold"></div>').appendTo($('#w3_ibacontainer0'));
+			_previewob.layer.domitem = $('#w3_previewlayer');
+		}
+		
 		
 		var arrstates = _previewob.arrstates;
 		for(var i=0; i<arrstates.length;i++)
@@ -1759,8 +2235,12 @@ W3Ex.ibaengine = (function($){
 			var state = arrstates[i];
 			$('<div style="position: absolute;left:0px;top:0px;display:inline;" data-id="'+state.stateid+'" id="w3_effect'+state.stateid+'-'+_previewob.counter+'" class="w3_effect"></div>').appendTo(_previewob.layer.domitem);
 			var $elem = $('#w3_effect'+state.stateid+'-'+_previewob.counter);
-			state.text = state.text.replace(new RegExp('\n','g'), '<br />');
-			$elem.html(state.text);
+			{
+				state.text = state.text.replace(new RegExp('\n','g'), '<br />');
+				$elem.html(state.text);
+				
+			}
+			
 			if(isDefined(state.style))
 			{
 				var style = state.style;

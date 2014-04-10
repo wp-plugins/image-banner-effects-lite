@@ -94,15 +94,25 @@ W3Ex.ibaengine = (function($){
 	}
 	var _arrEffects = [];
 	var _conitems = 0;
+	var _checkcounter = 0;
 	var _conitemsfin = 0;
 	var _u;
 	var _arrLayers = [];
 	var _arrImages = [];
 	var _curContainer;
-	var _animOffset = 40;
 	
 	function isDefined(x) { return x !== _u;}
 	
+	
+	function getContainer(index)
+	{
+		for(var i=0; i<W3Ex.containers.length; i++)
+		{
+			var container = W3Ex.containers[i];
+			if(container.id == index)
+				return container;
+		}
+	}
 	
 	function animateSingleItem(anim)
 	{
@@ -111,6 +121,12 @@ W3Ex.ibaengine = (function($){
 		var $elem = anim.domitem;
 		props.duration = anim.onappspeed;
 		props.complete = animationFinish;
+		var animOffset = 40;
+		var container = getContainer(anim.containerid);
+		if(container != undefined)
+		{
+			animOffset = container.animOffset;
+		}
 		var hastwo = false;
 		var width = anim.width;
 		var leftwidth = Math.round(width/2);
@@ -124,103 +140,96 @@ W3Ex.ibaengine = (function($){
 				left:anim.left + 'px',
 				visibility:"visible",
 				opacity:0,
-				transition:'',
-				transform:''
+				transform:'',
+				transition:''
 			});
 			switch(anim.onappear){
 				case "fadein":
 				{
 					props.opacity = 1;//show
-				}
-					break;
+				}break;
 				case "top":
 				{
 					$elem.css({
-						top:(anim.top-_animOffset) + 'px'
+						top:(anim.top - animOffset) + 'px'
 					});
 					props.top = anim.top+'px';
 					props.opacity =  1;
-				}
-					break;
+				}break;
 				case "left":
 				{
 					$elem.css({
-						left:(anim.left-_animOffset) + 'px'
+						left:(anim.left - animOffset) + 'px'
 					});
 					props.left = anim.left+'px';
 					props.opacity =  1;
-				}
-					break;
+				}break;
 				case "right":
 				{
 					$elem.css({
-						left:(anim.left+_animOffset) + 'px'
+						left:(anim.left + animOffset) + 'px'
 					});
-					props.left = anim.left+'px';
-					$elem.css({
-						'height':anim.height+'px'
-					});
+					{
+						props.left = anim.left+'px';
+						$elem.css({
+							'height':anim.height+'px'
+						});
+					}
 					props.opacity =  1;
-				}
-					break;
+				}break;
 				case "bottom":
 				{
 					$elem.css({
-						top:(anim.top+_animOffset) + 'px'
+						top:(anim.top + animOffset) + 'px'
 					});
 					props.top = anim.top+'px';
 					props.opacity =  1;
-				}
-					break;
+				}break;
 				default:
 					break;
 			}
 		}else if(anim.state.finish)
 		{
+			props.duration = anim.ondisspeed;
+			props.easing = anim.ondiseasing;
 			$elem.css({
 				top:anim.top+'px',
 				left:anim.left+'px',
 				transition:'',
 				transform:''
 			});
-			props.duration = anim.ondisspeed;
-			props.easing = anim.ondiseasing;
 			
 			switch(anim.ondis){
 				case "fadeout":
 				{
 					props.opacity = 0;//show
-				}
-					break;
+				}break;
 				case "top":
 				{
-					props.top = (anim.top-_animOffset)+'px';
+					props.top = (anim.top - animOffset)+'px';
 					props.opacity = 0;
 				}
 					break;
 				case "left":
 				{
-					props.left = (anim.left-_animOffset)+'px';
+					props.left = (anim.left - animOffset)+'px';
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				case "right":
 				{
-					props.left = (anim.left+_animOffset)+'px';
+					props.left = (anim.left + animOffset)+'px';
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				case "bottom":
 				{
-					props.top = (anim.top+_animOffset)+'px';
+					props.top = (anim.top + animOffset)+'px';
 					props.opacity = 0;
 				}break;
 				case "none":
 				{
 					props.duration = 10;
 					props.opacity = 0;
-				}
-					break;
+				}break;
 				default:
 					break;
 			}
@@ -257,10 +266,12 @@ W3Ex.ibaengine = (function($){
 			{
 				if(_notmodern)
 				{
+					
 					$elem.animate({opacity:1},anim.displayfor).animate(props,options);
 				}else
 				{
 					props.delay = anim.displayfor;
+					propssecond.delay = anim.displayfor;
 					$elem.transition(props);
 				}
 			}else
@@ -271,10 +282,10 @@ W3Ex.ibaengine = (function($){
 				}else
 				{
 					props.delay = 0;
+					propssecond.delay = 0;
 					$elem.transition(props);
 				}
 			}
-			
 		}
 	}
 	
@@ -307,6 +318,11 @@ W3Ex.ibaengine = (function($){
 					{
 						if(AnimItem.afterfin == "stop")
 							return;
+						if(AnimItem.afterfin != "loop")
+						{//apply static effect
+							var $elem = AnimItem.domitem;
+							return;
+						}
 					}
 					animateSingleItem(AnimItem);
 				}else if(AnimItem.state.finish)
@@ -314,13 +330,13 @@ W3Ex.ibaengine = (function($){
 					
 					var $elem = AnimItem.domitem;
 					$elem.css({
-							top:AnimItem.top+'px',
-							left:AnimItem.left+'px',
-							transform:'',
-							transition:'',
-							opacity:0,
-							visibility:'hidden'
-						});
+						top:AnimItem.top+'px',
+						left:AnimItem.left+'px',
+						transform:'',
+						transition:'',
+						opacity:0,
+						visibility:'hidden'
+					});
 					var AnimNew;
 					var nextstate = GetNextState(AnimItem); //old if no new state found
 					AnimNew = nextstate.anim;
@@ -351,6 +367,7 @@ W3Ex.ibaengine = (function($){
 			islast:false,
 			firstshow:false
 		}
+		
 		AnimItem.state = state;
 		AnimItem.domid =  $elem.attr("id");
 		AnimItem.width =  parseInt($elem.outerWidth(),10) + 3;
@@ -367,26 +384,41 @@ W3Ex.ibaengine = (function($){
 		AnimItem.ondis =  $elem.attr("data-ondis");
 		AnimItem.ondiseasing =  $elem.attr("data-ondiseasing");
 		AnimItem.ondisspeed =   parseInt($elem.attr("data-ondisspeed"),10);
-		AnimItem.staticeffect =  $elem.attr("data-staticeffect");
+		AnimItem.staticeffect =  "none";
 		var layer = GetLayer(AnimItem.layerid);
+		var container = getContainer(layer.containerid);
 		if(layer.width < AnimItem.width)
 		{
 			layer.domitem.css('width',AnimItem.width+'px');
 			layer.width = AnimItem.width;
+			if(container.standalone && !container.atttached)
+			{
+				var $condom = $('#w3_ibacontainer'+container.id);
+				$condom.css('max-width',AnimItem.width+'px');
+				container.width = AnimItem.width;
+			}
 		}
 		if(layer.height < AnimItem.height)
 		{
 			layer.domitem.css('height',AnimItem.height+'px');
 			layer.height = AnimItem.height;
+			if(container.standalone && !container.atttached)
+			{
+				var $condom = $('#w3_ibacontainer'+container.id);
+				$condom.css('max-height',AnimItem.height+'px');
+				container.height = AnimItem.height;
+			}
 		}
+		
 		$elem.css({
-			'position':'absolute',
-//			'display':'inline',
-			'height':AnimItem.height+'px',
-			'width':AnimItem.width+'px'
+			position:'absolute',
+			display:'inline-block',
+			height:AnimItem.height+'px',
+			width:AnimItem.width+'px'
 		});
 		return AnimItem;
 	}
+
 	function GetLayer(id)
 	{
 		for(var i=0; i<_arrLayers.length;i++)
@@ -423,6 +455,7 @@ W3Ex.ibaengine = (function($){
 		}
 		return true;
 	}
+	
 	function GetNextState(anim)
 	{
 		var nextstate = {}
@@ -473,24 +506,32 @@ W3Ex.ibaengine = (function($){
 			var bupdate = false;
 			var returnorig = false;
 			var imgitem =  _arrImages[i];
-			imgitem.$image.width()
-			if(imgitem.origwidth != imgitem.$image.width())
+			if(imgitem.origwidth != imgitem.$image.outerWidth())
 			{
-				imgitem.width = imgitem.$image.width();
-				imgitem.widthratio = imgitem.width / imgitem.origwidth;
+				
+				imgitem.width = imgitem.$image.outerWidth();
+				imgitem.widthratio = Number((imgitem.width / imgitem.origwidth).toFixed(2));
+				imgitem.heightratio = imgitem.widthratio;
+				
 				bupdate = true;
 			}else
 			{
 				returnorig = true;
 			}
-			if(imgitem.origheight != imgitem.$image.height())
+			
+			if(imgitem.origheight != imgitem.$image.outerHeight())
 			{
-				imgitem.height = imgitem.$image.height()
-				imgitem.heightratio = imgitem.height / imgitem.origheight;
+				imgitem.height = imgitem.$image.outerHeight()
+				imgitem.heightratio = Number((imgitem.height / imgitem.origheight).toFixed(2)); 
+				imgitem.widthtratio = imgitem.heightratio;
 				bupdate = true;
 				returnorig = false;
 			}
-			
+			if((imgitem.widthratio >= 1) || (imgitem.heightratio >= 1))
+			{
+				bupdate = false;
+				returnorig = true;
+			}
 			if(bupdate)
 			{
 				for(var j = 0; j < _arrLayers.length; j++)
@@ -503,11 +544,46 @@ W3Ex.ibaengine = (function($){
 					var scale = "";
 					if(imgitem.heightratio != 1 || imgitem.widthratio != 1)
 						scale = 'scale('+imgitem.widthratio+','+imgitem.heightratio+')';
-					layer.domitem.css({
-						left:(layer.left -(Math.floor((layer.width - (layer.width * imgitem.widthratio))/2))) + 'px',
-						top:(layer.top -(Math.floor((layer.height - (layer.height * imgitem.heightratio))/2))) + 'px',
-						transform:scale
-					});
+					var container = getContainer(layer.containerid);
+					if(!container.placeholder)
+					{
+						layer.domitem.css({
+							left:(layer.left -(Math.floor((layer.width - (layer.width * imgitem.widthratio))/2))) + 'px',
+							top:(layer.top -(Math.floor((layer.height - (layer.height * imgitem.heightratio))/2))) + 'px',
+							transform:scale
+						});
+					}else if(!container.attached)
+					{
+						layer.domitem.css({
+							left:(0 -(Math.floor((layer.width - (layer.width * imgitem.widthratio))/2))) + 'px',
+							top:(0 -(Math.floor((layer.height - (layer.height * imgitem.heightratio))/2))) + 'px',
+							transform:scale
+						});
+					}else
+					{
+						if(imgitem.origheight == imgitem.$image.outerHeight())
+						{
+							layer.domitem.css({
+							left:(layer.left -(Math.floor((layer.width - (layer.width * imgitem.widthratio))/2))) + 'px',
+							transform:scale
+							});
+						}else if(imgitem.origwidth == imgitem.$image.outerWidth())
+						{
+							layer.domitem.css({
+								top:(layer.top -(Math.floor((layer.height - (layer.height * imgitem.heightratio))/2))) + 'px',
+								transform:scale
+							});
+						}else
+						{
+							layer.domitem.css({
+								left:(layer.left -(Math.floor((layer.width - (layer.width * imgitem.widthratio))/2))) + 'px',
+								top:(layer.top -(Math.floor((layer.height - (layer.height * imgitem.heightratio))/2))) + 'px',
+								transform:scale
+							});
+						}
+						
+					}
+					
 					for(var k = 0; k < _arrEffects.length; k++)
 					{
 						var anim = _arrEffects[k];
@@ -524,11 +600,23 @@ W3Ex.ibaengine = (function($){
 					var layer = _arrLayers[j];
 					if(layer.containerid != imgitem.containerid)
 						continue;
-					layer.domitem.css({
-						left:layer.left + 'px',
-						top:layer.top  + 'px',
-						transform:''
-					});
+					var container = getContainer(layer.containerid);
+					if(!container.standalone)
+					{
+						layer.domitem.css({
+							left:layer.left + 'px',
+							top:layer.top  + 'px',
+							transform:''
+						});
+					}else if(!container.attached)
+					{
+						layer.domitem.css({
+							left:'0px',
+							top:'0px',
+							transform:''
+						});
+					}
+					
 					for(var k = 0; k < _arrEffects.length; k++)
 					{
 						var anim = _arrEffects[k];
@@ -541,17 +629,165 @@ W3Ex.ibaengine = (function($){
 			}
 		}
 	}
-	function startAnimations()
+	
+	function placeAttachedLayer(layer,coninfo,container)
 	{
-		UpdateLayers();
-		$( window ).resize(function() {
-			UpdateLayers();
-		});
+		var vircon = {};
+		vircon.width = coninfo.origwidth;
+		vircon.height = coninfo.origheight;
+		if(coninfo.origwidth < layer.width)
+			coninfo.origwidth = layer.width;
+		if(coninfo.origheight < layer.height)
+		    coninfo.origheight =  layer.height;
 
+		//virtual placeholder
+		if(vircon.width < layer.width || vircon.height < layer.height)
+		{
+			
+			//use bigger ratio for dimensions multiplier
+			var widthratio = Number((coninfo.origwidth / vircon.width).toFixed(2));
+			var heightratio = Number((coninfo.origheight / vircon.height).toFixed(2));  
+			var multiplier = 1;
+			if(widthratio > heightratio)
+			{
+				multiplier = widthratio;
+			}else
+			{
+				multiplier = heightratio;
+			}
+			
+			vircon.width = Math.ceil(vircon.width * multiplier);
+			vircon.height = Math.ceil(vircon.height * multiplier);
+			
+		}
+		if((container.ifoffset !== true) && (container.ifoffset !== false))
+		{
+			if(container.ifoffset == "true")
+			{
+				container.ifoffset = true;
+			}else
+			{
+				container.ifoffset = false;
+			}
+		}
+		var leftoffset = 0;
+		var topoffset = 0;
+		
+		if(container.ifoffset)
+		{
+			
+			var leftperc = parseInt(container.leftrightp,10);
+			if(leftperc >0 && leftperc <300)
+			{
+				if(container.leftrightd == "leftrightleft")
+				{//to the left -
+					leftoffset = Math.round(vircon.width * (0.01 * leftperc));
+				}else
+				{
+					leftoffset = -Math.round(vircon.width * (0.01 * leftperc));
+				}
+			}
+			var topperc = parseInt(container.topbottomp,10);
+			if(topperc >0 && topperc <300)
+			{
+				if(container.topbottomd == "topbottomtop")
+				{//to the top -
+					topoffset = Math.round(vircon.height * (0.01 * topperc));
+				}else
+				{
+					topoffset = -Math.round(vircon.height * (0.01 * topperc));
+				}
+			}
+		}
+		switch(container.elemposition){
+				case 'Top-left':
+				{
+					layer.left = 0 - leftoffset;
+					layer.top = 0 - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Top-middle':
+				{
+					layer.left = Math.ceil((vircon.width - layer.width) /2) - leftoffset;
+					layer.top = 0 - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Top-right':
+				{
+					layer.left = Math.ceil(vircon.width - layer.width) - leftoffset;
+					layer.top = 0 - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Mid-left':
+				{
+					layer.left = 0 - leftoffset;
+					layer.top = Math.ceil((vircon.height - layer.height) /2) - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Center':
+				{
+					layer.left = Math.ceil((vircon.width - layer.width) /2) - leftoffset;
+					layer.top = Math.ceil((vircon.height - layer.height) /2) - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Mid-right':
+				{
+					layer.left = Math.ceil(vircon.width - layer.width)- leftoffset;
+					layer.top = Math.ceil((vircon.height - layer.height) /2) - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Bot-left':
+				{
+					layer.left = 0 - leftoffset;
+					layer.top = Math.ceil(vircon.height - layer.height) - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Bot-middle':
+				{
+					layer.left = Math.ceil((vircon.width - layer.width) /2) - leftoffset;
+					layer.top = Math.ceil(vircon.height - layer.height) - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				case 'Bot-right':
+				{
+					layer.left = Math.ceil(vircon.width - layer.width) - leftoffset;
+					layer.top = Math.ceil(vircon.height - layer.height) - topoffset;
+					layer.origleft = layer.left;
+					layer.origtop = layer.top;
+				}break;
+				default:
+					break;
+			}
+		layer.domitem.css({
+			top:layer.top+'px',
+			left:layer.left+'px'
+		});
+	}
+	
+	function startAnimations(container)
+	{
+		if(container.effectsstarted != undefined && container.effectsstarted)
+			return;
+		container.effectsstarted = true;
+		UpdateLayers();
+		
+		
 		var _arrFirstEffects = [];
 		for(var i = 0; i < _arrEffects.length; i++)
 		{
 			var AnimItem = _arrEffects[i];
+			if(AnimItem.effectstarted != undefined && AnimItem.effectstarted)
+				continue;
+			if(AnimItem.containerid != container.id)
+				continue;
 			var has = false;
 			for(var j = 0; j < _arrFirstEffects.length; j++)
 			{
@@ -569,6 +805,11 @@ W3Ex.ibaengine = (function($){
 		for(var k = 0; k < _arrFirstEffects.length; k++)
 		{
 			var anim = _arrEffects[_arrFirstEffects[k]];
+			if(anim.effectstarted != undefined && anim.effectstarted)
+				continue;
+			if(anim.containerid != container.id)
+				continue;
+			anim.effectstarted = true;
 			anim.state.start = true;
 			anim.state.finish = false;
 			anim.state.curritem = true;
@@ -577,90 +818,184 @@ W3Ex.ibaengine = (function($){
 			anim.state.islast = CheckIfLast(anim);
 			animateSingleItem(anim);
 		}
-		
 	}
-	function buildAnimations(conindex)
+
+	function buildAnimations(container)
 	{
+		if(container.effectsbuilt != undefined && container.effectsbuilt)
+			return;
+		container.effectsbuilt = true;
 		var counteff = 0;
 		var counteffitem = 0;
-		if($('.w3_ibalayer' + conindex).length == 0) return;
-		
-		_curContainer = $('#w3_ibacontainer'+conindex);
-		if(_curContainer.length > 0)
+		var conindex = 0;
+		var attached = false;
 		{
-			 var $img = $('#w3_ibacontainer'+conindex+' img[data-id="'+conindex+'"]');
-			 if($img.length > 0)
-			 {
-			 	 var info = {
-				 	containerid:conindex,
-					$image:$img,
-					origwidth:parseInt($img.attr('data-width'),10),
-					origheight:parseInt($img.attr('data-height'),10)
+			conindex = container.id;
+			if($('.w3_ibalayer' + conindex).length == 0) return;
+			_curContainer = $('#' + container.elemid);
+			if(_curContainer.length > 0 && !container.placeholder)
+			{
+				 var $img = $('#w3_ibacontainer'+conindex+' img[data-id="'+conindex+'"]');
+				 if($img.length > 0)
+				 {
+				 	 var info = {
+					 	containerid:conindex,
+						$image:$img,
+						origwidth:parseInt($img.attr('data-width'),10),
+						origheight:parseInt($img.attr('data-height'),10)
+					 }
+					 info.width = $img.width();
+				     info.height = $img.height();
+					 info.widthratio = 1;
+					 info.heightratio = 1;
+					 
+					 _arrImages.push(info);
 				 }
-				 if(info.origwidth > info.origheight)
-				 	_animOffset = parseInt(info.origwidth * 0.14,10);
-				 else
-				 	_animOffset = parseInt(info.origheight * 0.14,10);
-				 info.width = $img.width();
-			     info.height = $img.height();
-				 _arrImages.push(info);
-			 }
+			}
 			
+			$('.w3_ibalayer' + conindex).each(function ()
+			 {
+				var newlayer = {};
+				newlayer.id = $(this).attr('data-id');
+				newlayer.domid =  $(this).attr('id');
+				newlayer.domitem = $('#'+newlayer.domid);
+				newlayer.containerid = conindex;
+				newlayer.width = 0;
+				newlayer.height = 0;
+				if(container.attached)
+				{
+					newlayer.origtop = 0;
+					newlayer.origleft = 0;
+				}
+				else
+				{
+					newlayer.origtop = newlayer.domitem.position().top;
+					newlayer.origleft = newlayer.domitem.position().left;
+				}
+				
+				_arrLayers.push(newlayer);
+			 })
+			for(var i=0; i<_arrLayers.length;i++)
+			{
+				
+				var layer = _arrLayers[i];
+				if(layer.containerid != conindex) continue;
+				$('.w3_ibalayerid' + layer.id +'_' +conindex).each(function ()
+				{
+					AddEffect($(this).attr('id'),conindex);	
+				});
+				if(layer.width > layer.height)
+				 	container.animOffset = parseInt(layer.width * 0.4,10);
+				 else
+				 	container.animOffset = parseInt(layer.height * 0.4,10);
+				if(container.placeholder)
+				{
+					var $img = $('#' + container.elemid);
+					 var info = {
+					 	containerid:conindex,
+						$image:$img,
+						origwidth:container.width,
+						origheight:container.height
+					 }
+					 
+					 info.width = $img.width();
+				     info.height = $img.height();
+					 if(container.attached){
+						layer.attachedrelative = 'w3exibe_attachedto_'+container.elemid;
+						$('<div id="'+layer.attachedrelative +'" style="position:relative;top:0px;left:0px;"></div>').prependTo($img);
+					 	info.origwidth = info.width;
+						info.origheight = info.height;
+						layer.domitem.detach().appendTo('#'+layer.attachedrelative);
+						layer.domitem.css({
+							position:'absolute'
+						});
+					 }
+					 placeAttachedLayer(layer,info,container);
+					 info.widthratio = 1;
+					 info.heightratio = 1;
+					 _arrImages.push(info);
+				}
+			}
+			for(var j = 0; j < _arrEffects.length; j++)
+			{
+				var anim = _arrEffects[j];
+				if(anim.containerid != container.id)
+					continue;
+				var layer = GetLayer(anim.layerid);
+				if(anim.height < layer.height)
+				{
+					anim.domitem.css('top',Math.round((layer.height - anim.height) /2) + 'px');
+				}
+				if(anim.width < layer.width)
+				{
+					anim.domitem.css('left',Math.round((layer.width - anim.width) /2) + 'px');
+				}
+				anim.origleft =  anim.domitem.position().left;
+				anim.origtop =  anim.domitem.position().top;
+				anim.left =  anim.origleft;
+				anim.top = anim.origtop;
+			}
 		}
 		
-		$('.w3_ibalayer' + conindex).each(function ()
-		 {
-			var newlayer = {};
-			newlayer.id = $(this).attr('data-id');
-			newlayer.domid =  $(this).attr('id');
-			newlayer.domitem = $('#'+newlayer.domid);
-			newlayer.containerid = conindex;
-			newlayer.width = 0;
-			newlayer.height = 0;
-			newlayer.origtop = newlayer.domitem.position().top;
-			newlayer.origleft = newlayer.domitem.position().left;
-			_arrLayers.push(newlayer);
-		 })
-		for(var i=0; i<_arrLayers.length;i++)
-		{
-			var layer = _arrLayers[i];
-			if(layer.containerid != conindex) continue;
-			$('.w3_ibalayerid' + layer.id +'_' +conindex).each(function ()
-			{
-				AddEffect($(this).attr('id'),conindex);	
-			});
-		}
-		for(var j = 0; j < _arrEffects.length; j++)
-		{
-			var anim = _arrEffects[j];
-			var layer = GetLayer(anim.layerid);
-			if(anim.height < layer.height)
-			{
-				anim.domitem.css('top',Math.round((layer.height - anim.height) /2) + 'px');
-			}
-			if(anim.width < layer.width)
-			{
-				anim.domitem.css('left',Math.round((layer.width - anim.width) /2) + 'px');
-			}
-			anim.origleft =  anim.domitem.position().left;
-			anim.origtop =  anim.domitem.position().top;
-			anim.left =  anim.origleft;
-			anim.top = anim.origtop;
-		}
+		
 	}
+	
+	$( window ).resize(function() {
+			UpdateLayers();
+		});
+		
 	 return {
+	 	checkforexistance:function(){
+			if(_checkcounter > 10)
+				return;
+			_checkcounter++;
+			var notfoundelem = false;
+			for(var j=0;j<W3Ex.containers.length;j++)
+			{
+				var container = W3Ex.containers[j];
+				if(container == undefined) continue;
+				if(container.foundid == undefined)
+				{
+					if(document.getElementById(container.elemid))
+					{
+						container.foundid = true;
+						imagesLoaded( document.getElementById(container.elemid), function( instance ) {
+							var con = "";
+							if(instance.elements != undefined)
+							{
+								if(instance.elements.length > 0)
+									con = instance.elements[0].id;
+							}
+						    W3Ex.ibaengine.finLoad(con);
+						});
+					}else
+					{
+						notfoundelem = true;
+					}
+				}
+			}
+			if(notfoundelem)
+				window.setTimeout(W3Ex.ibaengine.checkforexistance,1000);
+		},
 		incConItems:function(){
 			_conitems++;
 		},
-		finLoad:function(){
+		finLoad:function(elemid){
 			_conitemsfin++;
-			if(_conitemsfin == _conitems)
+			if(elemid != "" && elemid != undefined)
 			{
-				for(var i=0; i<_conitems; i++)
+				if(W3Ex.containers != undefined)
 				{
-					buildAnimations(i);
+					for(var i=0;i<W3Ex.containers.length;i++)
+					{
+						var container = W3Ex.containers[i];
+						if(container == undefined) continue;
+						if(container.elemid != elemid) continue;
+						buildAnimations(container);
+						startAnimations(container);
+						break;
+					}
 				}
-				startAnimations();
 			}
 		}
 		
@@ -670,31 +1005,29 @@ W3Ex.ibaengine = (function($){
 
 (function(){
 	var checkcons = 0;
-	while(true)
+	if(W3Ex != undefined)
 	{
-		var curitem = 'w3_ibacontainer' + checkcons;
-		if(document.getElementById(curitem))
+		if(W3Ex.containers != undefined)
 		{
-			W3Ex.ibaengine.incConItems();
-			checkcons++;
-		}else
-		{
-			break;
-		}
-	}
-	checkcons = 0;
-	while(true)
-	{
-		var curitem = 'w3_ibacontainer' + checkcons;
-		if(document.getElementById(curitem))
-		{
-			imagesLoaded( document.getElementById(curitem), function( instance ) {
-			   W3Ex.ibaengine.finLoad();
+			var notfoundelem = false;
+			for(var i=0;i<W3Ex.containers.length;i++)
+			{
+				var container = W3Ex.containers[i];
+				if(container == undefined) continue;
+				var elemid = container.elemid;
+				elemid = elemid.replace(/^\s+|\s+$/gm,''); //trim
+				if(elemid.length > 0)
+				{
+					if(elemid.charAt(0) == '#')
+					{
+						elemid = elemid.replace('#','');
+					}
+					container.elemid = elemid;
+				}
+			}
+			imagesLoaded(document.querySelectorAll('.w3_ibainner'), function( instance ) {
+				W3Ex.ibaengine.checkforexistance();
 			});
-			checkcons++;
-		}else
-		{
-			break;
 		}
 	}
 })();
