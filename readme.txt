@@ -3,7 +3,7 @@ Author: GeorgeIron
 Homepage: http://www.w3examples.com
 Donate link: http://www.w3examples.com/donate.php
 Tags: animations, ads, images, media
-Tested up to: 3.8.1
+Tested up to: 3.8.2
 Requires at least: 3.5
 Contributors: GeorgeIron
 Stable Tag: trunk
@@ -17,7 +17,8 @@ Mobile friendly css3 animations and responsive layers. The user interface is ver
 to work with and will get you started in minutes.
 
 Features:
-
+ - New - Create standalone layers without images.
+ - New - Attach an animated layer to any html element by ID.
  - Fully responsive css3 animations.
  - Default to pure jQuery animations in older browsers /IE8-IE9/.
  - Full control of state display time and animation effect duration.
@@ -39,6 +40,9 @@ Howtos with screenshots
 Upload the Image Banner Effects Lite plugin to your blog and activate it.
 
 == Changelog ==
+= 1.1 =
+* Standalone layers
+* Attached layer to element ID
 = 1.0 =
 * Initial release
 
