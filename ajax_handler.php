@@ -21,7 +21,30 @@ class W3ExIBEffectsAjaxHandler{
       	$wpdb->insert($table_name,$args);
 		$data['id'] = $wpdb->insert_id;
 		$infoto = "width: ".$data['width']."  height: ".$data['height']."  ";
-		$infoto.="<br/>layers:0<br/>layer states:0";
+		$infoto.="<br/>layers: 0<br/>layer states: 0";
+		$data['infoto'] = $infoto;
+		$data['shortcode'] = '[ibeffects id="'.$data['id'].'"]';
+		$wpdb->update( 
+			$table_name, 
+			array( 
+				'info' => json_encode($data)
+			), 
+			array( 'ID' => $data['id'] )
+			);
+		return $data;
+	}
+	
+	public static function handleNewElement($data)
+	{
+		global $wpdb;
+		$table_name = W3ExImageBannerMain::$table_name;
+        $args=array(
+	        'info'    =>json_encode($data),
+	        'type'    => 2//,
+      	);
+      	$wpdb->insert($table_name,$args);
+		$data['id'] = $wpdb->insert_id;
+		$infoto= "layer states: 0";
 		$data['infoto'] = $infoto;
 		$data['shortcode'] = '[ibeffects id="'.$data['id'].'"]';
 		$wpdb->update( 
@@ -50,7 +73,7 @@ class W3ExIBEffectsAjaxHandler{
 		{
 			$poldinfo = json_decode($oldinfo->info);
 			$infoto = "width: ".$poldinfo->width."  height: ".$poldinfo->height."  ";
-			$infoto.="<br/>layers:".$data['layercount']."<br/>layer states:".$data['statecount'];
+			$infoto.="<br/>layers: ".$data['layercount']."<br/>layer states: ".$data['statecount'];
 			$poldinfo->infoto = $infoto;
 			$wpdb->update( 
 				$table_name, 
@@ -66,6 +89,56 @@ class W3ExIBEffectsAjaxHandler{
 				$table_name, 
 				array( 
 					'text' => json_encode($data['layers'])
+				), 
+				array( 'ID' => $data['id'] )
+			);
+		}
+	}
+	
+	public static function handleSaveElementChanges($data)
+	{
+		global $wpdb;
+		$table_name = W3ExImageBannerMain::$table_name;
+		$oldinfo = $wpdb->get_row( "SELECT * FROM $table_name WHERE type=2 AND id=".$data['id'] );
+		if(!empty($oldinfo))
+		{
+			$poldinfo = json_decode($oldinfo->info);
+			$infoto = "layer states: ".$data['statecount'];
+			$poldinfo->infoto = $infoto;
+			$wpdb->update( 
+				$table_name, 
+				array( 
+					'text' => json_encode($data['layers']),
+					'info' => json_encode($poldinfo)
+				), 
+				array( 'ID' => $data['id'] )
+			);
+		}else
+		{
+			$wpdb->update( 
+				$table_name, 
+				array( 
+					'text' => json_encode($data['layers'])
+				), 
+				array( 'ID' => $data['id'] )
+			);
+		}
+	}
+	
+	public static function handleUpdateElement($data)
+	{
+		global $wpdb;
+		$table_name = W3ExImageBannerMain::$table_name;
+		$oldinfo = $wpdb->get_row( "SELECT * FROM $table_name WHERE type=2 AND id=".$data['id'] );
+		if(!empty($oldinfo))
+		{
+			$infoto = json_decode($oldinfo->info);
+			$data['infoto'] = $infoto->infoto;
+			$data['shortcode'] = $infoto->shortcode;
+			$wpdb->update( 
+				$table_name, 
+				array( 
+					'info' => json_encode($data)
 				), 
 				array( 'ID' => $data['id'] )
 			);
@@ -95,6 +168,7 @@ class W3ExIBEffectsAjaxHandler{
 		}
 	}
 	
+	
     public static function ajax()
     {
 		$nonce = $_POST['nonce'];
@@ -113,8 +187,11 @@ class W3ExIBEffectsAjaxHandler{
 			case 'newimage':
 			{
 				$arr['id'] = self::handleNewImage($data);
-			}
-				break;
+			}break;
+			case 'newelement':
+			{
+				$arr['id'] = self::handleNewElement($data);
+			}break;
 			case 'deleteimage':
 			{
 				self::handleDeleteImage($data);
@@ -122,8 +199,15 @@ class W3ExIBEffectsAjaxHandler{
 			case 'savechanges':
 			{
 				self::handleSaveChanges($data);
-			}
-				break;
+			}break;
+			case 'saveelementchanges':
+			{
+				self::handleSaveElementChanges($data);
+			}break;
+			case 'updateelement':
+			{
+				self::handleUpdateElement($data);
+			}break;
 			case 'savestyle':
 			{
 				self::handleSaveStyle($data);

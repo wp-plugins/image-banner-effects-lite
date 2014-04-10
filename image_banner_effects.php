@@ -1,12 +1,13 @@
 <?php   
 /* 
-Plugin Name: Image Banner Effects 
+Plugin Name: Image Banner Effects Lite
 Plugin URI: http://www.w3examples.com/wordpress/image_banner_effects.php
 Description: Create banner effects for your images
 Author: George Iron
-Version: 1.0 
+Version: 1.1 
 Author URI: http://www.w3examples.com
 */ 
+ 
  
 defined( 'ABSPATH' ) || die( 'No direct script access allowed!' );
 
@@ -88,7 +89,7 @@ class W3ExImageBannerMain {
 		wp_enqueue_style('w3exibe-adminboot',$purl.'css/bootstrap-cust.css',false, '1.0', 'all' );
 		wp_enqueue_style('w3exibe-clienteffects',$purl.'css/ibeffects-client.css',false, '1.0', 'all' );
 		wp_enqueue_style('w3exibe-admincss',$purl.'css/admin.css',false, '1.0', 'all' );
-		wp_enqueue_script('w3exibe_adminjs', $purl . 'js/admin-lite.js',  array(), '1.0.0', true );
+		wp_enqueue_script('w3exibe_adminjs', $purl . 'js/admin-lite-min.js',  array(), '1.0.0', true );
 		wp_enqueue_style('w3exibe-spect',$purl.'css/spectrum.css',false, '1.0', 'all' );
 		wp_enqueue_script('w3exibe-jqspect',$purl.'js/spectrum.js', array(), '1.0', true );
 		wp_localize_script('w3exibe_adminjs', 'W3ExIBA', array(
@@ -103,7 +104,7 @@ class W3ExImageBannerMain {
 	{
 		$purl = plugin_dir_url(__FILE__);
 		wp_enqueue_style('w3exibe-clienteffects',$purl.'css/ibeffects-client.css',false, '1.0', 'all' );
-		wp_enqueue_script('w3exibe-jseffects', $purl . 'js/clienteffects-lite.js', array('jquery'), '1.0.0', true );
+		wp_enqueue_script('w3exibe-jseffects', $purl . 'js/clienteffects-lite-min.js', array('jquery'), '1.0.0', true );
 	}
 	
 	public static function generate_shortcode($atts,$content=NULL )
@@ -116,13 +117,55 @@ class W3ExImageBannerMain {
 		$html = '';
 		if(is_numeric($id))
 		{
-			$row = $wpdb->get_row( "SELECT * FROM ".self::$table_name." WHERE id=$id AND type=0" );
+			$row = $wpdb->get_row( "SELECT * FROM ".self::$table_name." WHERE id=$id AND (type=0 OR type=2)");
 			if(!empty($row))
 			{
 				$data = json_decode($row->info);
-				$html.= '<div id="w3_ibacontainer'.self::$idCounter.'" class="w3_ibacontainer" style="position: relative;overflow: hidden;max-width:'.$data->width.'px;">';
-				
-				$html.= '<img class="w3ex_ibaimage" data-width="'.$data->width.'" data-height="'.$data->height.'" data-id="'.self::$idCounter.'" src="'.$data->img.'"/>';
+				$type = json_decode($row->type);
+				$html.= "<script>
+						 var W3Ex = W3Ex || {};
+						 W3Ex.containers = W3Ex.containers || [];
+						 var newcontainer = {};";
+				$html.= "newcontainer.id = ".self::$idCounter.";";
+				if($type == 0)
+				{
+					$html.= "newcontainer.elemid = 'w3_ibacontainer".self::$idCounter."';";
+					$html.= "newcontainer.placeholder = false;";
+					$html.= "newcontainer.attached = false;";
+				}else
+				{
+					$html.= "newcontainer.placeholder = true;";
+					if($data->standalone == "true")
+					{
+						$html.= "newcontainer.standalone = true;";
+						$html.= "newcontainer.attached = false;";
+						$html.= "newcontainer.elemid = 'w3_ibacontainer".self::$idCounter."';";
+					}else
+					{
+						$html.= "newcontainer.standalone = false;";
+						$html.= "newcontainer.attached = true;";
+						$html.= "newcontainer.elemid = '".$data->elemid."';";
+						$html.= "newcontainer.elemposition = '".$data->elemposition."';";
+						$html.= "newcontainer.ifoffset = '".$data->ifoffset."';";
+						$html.= "newcontainer.leftrightp = '".$data->leftrightp."';";
+						$html.= "newcontainer.leftrightd = '".$data->leftrightd."';";
+						$html.= "newcontainer.topbottomp = '".$data->topbottomp."';";
+						$html.= "newcontainer.topbottomd = '".$data->topbottomd."';";
+					}
+				}
+				$html.= "W3Ex.containers.push(newcontainer);";
+				$html.= "</script>";
+				if($type == 0)
+				{
+					$html.= '<div id="w3_ibacontainer'.self::$idCounter.'" class="w3_ibacontainer" style="position: relative;overflow: hidden;max-width:'.$data->width.'px;">';
+					
+					$html.= '<img class="w3ex_ibaimage" data-width="'.$data->width.'" data-height="'.$data->height.'" data-id="'.self::$idCounter.'" src="'.$data->img.'"/>';
+				}else
+				{
+					{
+						$html.= '<div id="w3_ibacontainer'.self::$idCounter.'" class="w3c_wrap_element">';
+					}
+				}
 				$layers = json_decode($row->text);
 				if(!empty($layers))
 				{
@@ -132,10 +175,15 @@ class W3ExImageBannerMain {
 				{
 				foreach ($layers->layers->items as $item)
 				{
-					$html.= '<div id="w3_ibalayer'.self::$idCounter.'_'.$item->id.'" class="w3_ibalayer'.self::$idCounter.'" style="position: absolute;top:'.$item->top.'px;
-					left:'.$item->left.'px;display:inline;" data-id="'.$item->id.'"></div>';
+					if($type == 0)
+					{
+						$html.= '<div id="w3_ibalayer'.self::$idCounter.'_'.$item->id.'" class="w3_ibalayer'.self::$idCounter.' w3ibe_layer" style="position: absolute;top:'.$item->top.'px;
+						left:'.$item->left.'px;display:inline;" data-id="'.$item->id.'"></div>';
+					}else{
+						$html.= '<div id="w3_ibalayer'.self::$idCounter.'_'.$item->id.'" class="w3_ibalayer'.self::$idCounter.' w3ibe_layer" style="position: relative;display:inline-block;" data-id="'.$item->id.'"></div>';
+					}
 				}
-				$html.= '<div id="w3_ibainner" style="position:relative;overflow:hidden;">';
+				$html.= '<div class="w3_ibainner" style="position:relative;overflow:hidden;">';
 				foreach ($layers->states->items as $item)
 				{
 					if(!property_exists($item,'layerid')) continue;
@@ -154,8 +202,10 @@ class W3ExImageBannerMain {
 					data-onappspeed="'.$item->onappearspeed.'"
 					data-ondis="'.$item->ondisappear.'"
 					data-ondiseasing="'.$item->ondisappeareasing.'"
-					data-ondisspeed="'.$item->ondisappearspeed.'"
-					style="position: absolute;left:0px;top:0px;display:inline;';
+					data-ondisspeed="'.$item->ondisappearspeed.'"';
+					if(property_exists($item,'staticeffect'))
+					$html.= ' data-staticeffect="'.$item->staticeffect.'" ';
+					$html.= 'style="position: absolute;left:0px;top:0px;display:inline;';
 					if(property_exists($item,'style') && !empty($item->style))
 					{
 						if(property_exists($item->style,'fontsize') && !empty($item->style->fontsize))
@@ -184,9 +234,29 @@ class W3ExImageBannerMain {
 						}
 					}
 					$html.='">';
-					$texta =  $item->text;
-					$texta = nl2br($texta);
-					$html.=$texta;
+					switch($item->type){
+						case "text":{
+							$texta =  $item->text;
+							$texta = nl2br($texta);
+							$texta = str_replace('\\\\','@@@@@',$texta);
+							$texta = str_replace('\\','',$texta);
+							$texta = str_replace('@@@@@','\\\\',$texta);
+							$html.=$texta;
+						}
+						break;
+						case "html":{
+							$texta =  $item->html;
+							$texta = str_replace('\\"','"',$texta);
+							$html.=$texta;
+						}
+						break;
+						case "image":{
+							$html.= '<img src="'.$item->imagesrc.'" />';
+						}
+						break;
+						default:
+							break;
+					}	
 					$html.='</div>';
 				}
 				}}}
