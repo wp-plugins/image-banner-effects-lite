@@ -150,6 +150,7 @@
 }
 #editorcontainer{
 	visibility: hidden;
+	display: none;
 	height: 0px;
 	margin-bottom: 30px;
 	padding:10px;
