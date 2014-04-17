@@ -4,7 +4,7 @@ Plugin Name: Image Banner Effects Lite
 Plugin URI: http://www.w3examples.com/wordpress/image_banner_effects.php
 Description: Create banner effects for your images
 Author: George Iron
-Version: 1.1 
+Version: 1.2 
 Author URI: http://www.w3examples.com
 */ 
  
