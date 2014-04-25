@@ -61,6 +61,12 @@ W3Ex.ibaengine = (function($){
 	_previewob.ispreview = false;
 	_previewob.counter = 0;
 	
+	$(document).on( "click",'div.defaultlayer a', function(e) 
+	{
+		e.preventDefault();
+		return false;
+	});
+	
 	$('#aelementid').keyup(function(){
        $('#elementerror').html('');
     });
@@ -178,7 +184,6 @@ W3Ex.ibaengine = (function($){
 				if(W3Ex.currcontainer != undefined && W3Ex.currcontainer)
 				{
 					var id = W3Ex.clickedelem.attr('data-id');
-					
 					for(var i = 0; i < W3Ex.containers.length; i++){
 						var container = W3Ex.containers[i];
 						if(container == undefined) continue;
@@ -343,7 +348,6 @@ W3Ex.ibaengine = (function($){
 				      }) ; 
 				}else
 				{
-					
 					var newimg = {};
 					newimg.action = 'ibeffects_ajax_request';
 					newimg.type = 'newelement';
@@ -523,10 +527,14 @@ W3Ex.ibaengine = (function($){
 			if(_selected.layer == -1)
 			{
 				$(_buts.newtext).attr("disabled","disabled");
+				$(_buts.newhtml).attr("disabled","disabled");
+				$(_buts.newimage).attr("disabled","disabled");
 				$(_buts.previewlayer).attr("disabled","disabled");
 				$(_buts.deletelayer).attr("disabled","disabled");
 			}else{
 				$(_buts.newtext).removeAttr("disabled");
+				$(_buts.newhtml).removeAttr("disabled");
+				$(_buts.newimage).removeAttr("disabled");
 				var arrstates = GetLayerStates(_selected.layer);
 				if(arrstates.length == 0)
 					$(_buts.previewlayer).attr("disabled","disabled");
@@ -948,7 +956,7 @@ W3Ex.ibaengine = (function($){
 			state.ondisappear = $('#ondisappeartype').val();
 			state.ondisappeareasing = $('#ondisappeareasing option:selected').val();
 			state.ondisappearspeed = $('#ondisappearspeed').val();
-			state.staticeffect = "none";
+			state.staticeffect = $('#laststateeffect option:selected').val();
 		}
 		
 		if(bsorting)
@@ -1049,7 +1057,7 @@ W3Ex.ibaengine = (function($){
 	
 	function Init()
 	{
-		if($('#newtextstate').length)
+		if($('#newhtmlstate').length)
 		{//edit image
 			_selected.layer = -1;
 			
@@ -1125,14 +1133,19 @@ W3Ex.ibaengine = (function($){
 	            height: 640,
 	            width: 780,
 	            modal: true,
-				draggable:false,
+				draggable:true,
 				resizable:false,
 				closeOnEscape: false,
+				create: function (event, ui) {
+			        $(this).dialog('widget')
+			            .css({ position: 'fixed'})
+			    },
 				open: function( event, ui ) {
 					 var d = $('.ui-dialog:visible');
 					 $(d).css('z-index',300002);
 					  $('.ui-widget-overlay').each(function () {
 	   					 $(this).next('.ui-dialog').andSelf().wrapAll('<div class="w3exvtfscope w3exvtfdel" />');
+						 $('#showdialog').css('height','auto');
 				});
 					$('span.ui-icon-closethick').css({
 													   left : '0px',
@@ -1261,6 +1274,65 @@ W3Ex.ibaengine = (function($){
 					FillLayerState(_selected.layer,_selected.state);
 				}
                  $( this ).dialog( "close" );
+              },
+              Cancel: function()
+			  {
+				  $( this ).dialog( "close" );
+              }
+            }
+		});
+		
+		
+		$("#showimagesizes").dialog({			
+	            autoOpen: false,
+	            height: 420,
+	            width: 680,
+	            modal: true,
+				draggable:false,
+				resizable:false,
+				closeOnEscape: false,
+				open: function( event, ui ) {
+					 var d = $('.ui-dialog:visible');
+					 $(d).css('z-index',300002);
+					  $('.ui-widget-overlay').each(function () {
+	   					 $(this).next('.ui-dialog').andSelf().wrapAll('<div class="w3exvtfscope w3exvtfdel" />');
+				});
+					$('span.ui-icon-closethick').css({
+													   left : '0px',
+													   top : '0px'
+													});
+					
+			},
+			close: function( event, ui ) {
+				
+			},
+   			 buttons: {
+              "OK": function() {
+			  
+			  	var selid = $('input[name=radioi]:checked').attr('id');
+				if(selid != undefined)
+				{
+					SaveLayerState(_selected.layer,_selected.state);
+					var stateid = _idcounts.state;
+					_idcounts.state++;
+					var seldiv = '<div class="selstatediv"></div>';
+					var newl = '<li data-id="' + stateid + '" class="ui-state-highlight layerstate" >Image State<button class="btn btn-danger btn-sm deletestate" type="button" title="Delete State">' +
+					'<span class="glyphicon glyphicon-trash"></span>' +
+					'</button></li>';
+					$('li.layerstate').removeClass('selstate').find($('div')).remove();
+					$('#statescontainer').append(newl);
+					$('#statescontainer > li:last').addClass('selstate').append(seldiv);
+					_selected.state = stateid;
+					UpdateUI("state");
+					var state = GetState(_selected.layer,stateid);
+					state.type = "image";
+					state.imagesrc = _arrimgs[selid];
+					ShowDefaultState("image");
+					FillLayerState(_selected.layer,stateid);
+					UpdateUI("layer");
+	                 $( this ).dialog( "close" );
+				}
+				
               },
               Cancel: function()
 			  {
@@ -1508,8 +1580,7 @@ W3Ex.ibaengine = (function($){
 		if(layerid == -1 || stateid == -1)
 			return;
 		var state = GetState(layerid,stateid);
-//		if(state.type == "text")
-		{
+		if(state.type == "text"){
 			$('#changestyle').removeAttr("disabled");
 			$('#contenttype').text("Text");
 			$('#statecontentdiv').removeClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
@@ -1520,10 +1591,31 @@ W3Ex.ibaengine = (function($){
 			state.text = state.text.replace(/\\\\/g, '@@@@@');
 			state.text = state.text.replace(/\\/g, '');
 			state.text = state.text.replace(/@@@@@/g, '\\');
+//			$('#statecontent').val(state.text.replace(new RegExp('<br />','g'), '\n'));
 			$('#statecontent').val(state.text);
 		    $_sellayer.html(state.text);
+		}else if(state.type == "html"){
+		 	$('#changestyle').removeAttr("disabled");
+			$('#contenttype').text("Html");
+			$('#statecontent').hide();
+			$('#statecontentdiv').show();
+			$('#statecontentdiv').addClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
+			$('#editcontent').show();
+			state.html = state.html.replace(/\\"/g, "\"");
+			$('#statecontentdiv').html(state.html);
+		    $_sellayer.html(state.html);
+		}else if(state.type == "image"){
+		 	
+			$('#contenttype').text("Image");
+			$('#statecontent').hide();
+			$('#statecontentdiv').show();
+			$('#statecontentdiv').addClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
+			$('#editcontent').hide();
+			$('#changestyle').attr("disabled","disabled");
+			var html = '<img src="' +state.imagesrc+'" />';
+			$('#statecontentdiv').html(html);
+		    $_sellayer.html(html);
 		}
-		
 		$_sellayer.removeClass('defaultstyle');
 		if(isDefined(state.style))
 		{
@@ -1597,14 +1689,17 @@ W3Ex.ibaengine = (function($){
 			$('#ondisappearspeed').val(state.ondisappearspeed);
 		else
 			$('#ondisappearspeed').val(500);
+		if(isDefined(state.staticeffect))
+			$('#laststateeffect').val(state.staticeffect);
+		else
+			$('#laststateeffect').val('tada');
 		
 	}
 
 	function ShowDefaultState(type)
 	{
 		$_sellayer.html("");
-//		if(type == "text")
-		{
+		if(type == "text"){
 			$('#contenttype').text("Text");
 			$('#statecontentdiv').removeClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
 			$('#statecontentdiv').hide();
@@ -1612,6 +1707,23 @@ W3Ex.ibaengine = (function($){
 			$('#statecontent').show();
 			$('#statecontent').val("");
 			$('#changestyle').removeAttr("disabled");
+		}else if(type == "html"){
+			$('#contenttype').text("Html");
+			$('#statecontent').hide();
+			$('#statecontentdiv').show();
+			$('#statecontentdiv').addClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
+			$('#editcontent').show();
+			$('#statecontentdiv').html("");
+			$('#changestyle').removeAttr("disabled");
+		}else if(type == "image"){
+			$('#contenttype').text("Image");
+			$('#statecontent').hide();
+			$('#statecontentdiv').show();
+			$('#statecontentdiv').addClass("ui-nobackground ui-widget ui-state-default ui-corner-all");
+			$('#editcontent').show();
+			$('#statecontentdiv').html("");
+			$('#editcontent').hide();
+			$('#changestyle').attr("disabled","disabled");
 		}
 		
 		$_sellayer.removeClass('defaultstyle');
@@ -1631,6 +1743,7 @@ W3Ex.ibaengine = (function($){
 		$('#ondisappeartype').val('fadeout');
 		$('#ondisappeareasing').val('ease');
 		$('#ondisappearspeed').val(500);
+		$('#laststateeffect').val('tada');
 	}
 	
 
@@ -1666,7 +1779,47 @@ W3Ex.ibaengine = (function($){
       $_sellayer.html(val);
     });
 	
-	
+	$('#htmleditorok').click(function ()
+	 {
+		$('#editorcontainer').css("visibility","hidden");//css("display","inline");
+		$('#editorcontainer').css("display","none");
+		$("#editorcontainer").css("height","0px");
+		$("#wp-posttext-wrap").css("visibility","hidden");
+		$("#wp-posttext-wrap").css("height","0px");
+		$('.w3exvtfscope').show();
+		var html = tinyMCE.get('editorid').getContent();
+		$('#statecontentdiv').html(html);
+		$_sellayer.html(html);
+		var state = GetState(_selected.layer,_selected.state);
+		state.html = html;
+		 $('html, body').animate({
+	        scrollTop: parseInt($("#statecontentdiv").offset().top)
+	    }, 500);
+	 });
+
+	$('#htmleditorcancel').click(function ()
+	{
+		$('#editorcontainer').css("visibility","hidden");//css("display","inline");
+		$('#editorcontainer').css("display","none");
+		$("#editorcontainer").css("height","0px");
+		$("#wp-posttext-wrap").css("visibility","hidden");
+		$("#wp-posttext-wrap").css("height","0px");
+		$('.w3exvtfscope').show();
+		 $('html, body').animate({
+		    scrollTop: parseInt($("#statecontentdiv").offset().top)
+		}, 500);
+	});
+
+	$('#editcontent').click(function ()
+	{
+		$('.w3exvtfscope').css("display","none");
+		$('#editorcontainer').css("visibility","visible");//css("display","inline");
+		$('#editorcontainer').css("display","block");
+		$("#editorcontainer").css("height","auto");
+		$("#wp-posttext-wrap").css("visibility","visible");
+		$("#wp-posttext-wrap").css("height","400px");
+		tinyMCE.get('editorid').setContent($('#statecontentdiv').html());
+	});
 	
 
 	(function ()
@@ -1694,6 +1847,79 @@ W3Ex.ibaengine = (function($){
 			ShowDefaultState("text");
 		});
 		
+		$('#newhtmlstate').click(function ()
+		{
+			SaveLayerState(_selected.layer,_selected.state);
+			var stateid = _idcounts.state;
+			_idcounts.state++;
+			var seldiv = '<div class="selstatediv"></div>';
+			var newl = '<li data-id="' + stateid + '" class="ui-state-highlight layerstate" >Html State<button class="btn btn-danger btn-sm deletestate" type="button" title="Delete State">' +
+			'<span class="glyphicon glyphicon-trash"></span>' +
+			'</button></li>';
+			
+			$('li.layerstate').removeClass('selstate').find($('div')).remove();
+			$('#statescontainer').append(newl);
+			$('#statescontainer > li:last').addClass('selstate').append(seldiv);
+			_selected.state = stateid;
+			UpdateUI("state");
+			var state = GetState(_selected.layer,stateid);
+			UpdateUI("layer");
+			state.type = "html";
+			state.text = "";
+			state.html = "";
+			ShowDefaultState("html");
+		});
+		
+		var layer_uploader;
+		$('#newimagestate').click(function(e){
+			e.preventDefault();
+			//If the uploader object has already been created, reopen the dialog
+			if (layer_uploader) {
+				layer_uploader.open();
+			    return;
+			}
+			layer_uploader = wp.media.frames.file_frame = wp.media({
+				title: 'Choose Image',
+				library: {
+	           		 type: 'image'
+	    	    },
+			    button: {
+			    			text: 'Choose Image'
+			            },
+			    multiple: false,
+				displaySettings: true,
+	       		displayUserSettings: true
+			});
+	        //When a file is selected, grab the URL and set it as the text field's value
+	        layer_uploader.on('select', function() {
+	        	var attachment = layer_uploader.state().get('selection').first().toJSON();
+				var size = attachment.sizes;
+				var html = "Select image size to continue<br /><br />";
+				var counter = 0;
+				_arrimgs.length = 0;
+				var backimg = "";
+				for(key in size)
+				{
+					var img = attachment.sizes[key];
+					if(img == _u) continue;
+					if(key == "thumbnail")
+						backimg = img.url;
+					html+= '<input type="radio" id="'+counter+'" name="radioi"><label for="' +counter+'"> ';
+					html+= ( key.charAt(0).toUpperCase() + key.slice(1)) + ' - ( width: ' + img.width + ' ) ( height: ' +img.height + ' )</label> <br/>';
+					_arrimgs[counter] = img.url;
+					if(backimg == "")
+						backimg = img.url;
+					counter++;
+				}
+				
+				html+= '<div id="imageurl"></div>';
+				$('#showimagesizesinner').html(html);
+				$('#showimagesizes').dialog('open');
+				
+	        });
+			//Open the uploader dialog
+			layer_uploader.open();
+		});
 		Init();
 	 })();
 	
@@ -1862,6 +2088,111 @@ W3Ex.ibaengine = (function($){
 		_arrEffects.push(AnimItem);
 	}
 	
+	function StaticAnimation($domitem,anim)
+	{
+		$domitem.removeClass(anim + ' animated').addClass(anim + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+  				$domitem.removeClass(anim + ' animated');
+			 });
+	}
+	
+	function buidTwoHalfStates(anim,type,animtype)
+	{
+		var animtype = typeof animtype !== 'undefined' ? animtype : "app";
+		var width = anim.width;
+		var leftwidth = Math.round(width/2);
+		var rightwidth = width - leftwidth;
+		var height = anim.height;
+		var topheight = Math.round(height/2);
+		var botheight = height - topheight;
+		var $elem = anim.domitem;
+		var css = {
+			visibility:"visible",
+			opacity:1,
+			transform:"",
+			left:"0px",
+			top:'0px'
+		}
+		if(animtype == "app")
+		{
+			if(type == "mixed")
+			{
+				css.left = '-'+width+'px';
+			}else if(type == "hflip")
+			{
+				css.top = topheight+'px';
+			}else if(type == "vflip")
+			{
+				css.left = leftwidth+'px';
+			}	
+		}
+		$elem.wrap('<div id="wrap_'+anim.domid+'"></div>');
+		
+				
+		var wrapcss = {
+			position:'absolute',
+			top:anim.top+'px',
+			left:anim.left + 'px',
+			height:topheight+'px',
+			width:anim.width+'px'	,
+			transform:'',
+			overflow:'hidden'
+		}
+		
+		if(type == "vflip")
+		{
+			wrapcss.height = height+'px';
+			wrapcss.width = leftwidth+'px';
+		}	
+		$('#wrap_'+anim.domid).css(wrapcss);	
+		$elem.css(css);
+		
+		$elem.clone().attr('id',anim.domid + 'second').prependTo(anim.layerdom);
+		$('#'+anim.domid + 'second').wrap('<div id="wraps_'+anim.domid+'"></div>');
+		var secondstatecss = {
+			opacity:'1',
+			visibility:'visible',
+			left:'0px',
+			top:'-'+height+'px'
+//			display:'inline-block'
+		}
+		if(animtype == "app")
+		{
+			if(type == "vflip")
+			{
+				secondstatecss.left = '-'+width+'px';
+				secondstatecss.top = '0px';
+			}	
+		}else
+		{
+			if(type == "mixed" || type == "hflip")
+			{
+				secondstatecss.top = '-'+topheight+'px';
+			}else if(type == "vflip")
+			{
+				secondstatecss.left = '-'+leftwidth+'px';
+				secondstatecss.top = '0px';
+			}	
+		}
+		var secondwrapcss = {
+			position:'absolute',
+			top:(anim.top + topheight)+'px',
+			left:anim.left +'px',
+			height:botheight+'px',
+			width:anim.width+'px'	,
+			transform:'',
+			overflow:'hidden'
+		}
+		if(type == "vflip")
+		{
+			secondwrapcss.left = (anim.left + leftwidth) +'px';
+			secondwrapcss.top = anim.top+'px';
+			secondwrapcss.height = height+'px';
+			secondwrapcss.width = leftwidth+'px';
+		}	
+		$('#wraps_'+anim.domid).css(secondwrapcss);
+		$('#'+anim.domid + 'second').css(secondstatecss);
+		
+	}
 	
 	function animateSingleItem(anim)
 	{
@@ -1887,6 +2218,44 @@ W3Ex.ibaengine = (function($){
 				transform:''
 			});
 			switch(anim.onappear){
+				case "mixed":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"mixed");
+					var topheight = Math.ceil(anim.height/2);
+					propssecond.duration = anim.onappspeed;
+					propssecond.easing = anim.onappeasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+topheight+'px';
+					props.opacity = 1;//show
+					props.left = '0px';
+				}
+					break;
+				case "hflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"hflip");
+					propssecond.duration = anim.onappspeed;
+					propssecond.easing = anim.onappeasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+topheight+'px';
+					props.opacity = 1;//show
+					props.left = '0px';
+					props.top = '0px';
+				}
+					break;
+				case "vflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"vflip");
+					propssecond.duration = anim.onappspeed;
+					propssecond.easing = anim.onappeasing;
+					propssecond.opacity = 1;//show
+					propssecond.left = '-'+leftwidth+'px';
+					props.opacity = 1;//show
+					props.left = '0px';
+				}
+					break;
 				case "fadein":
 				{
 					props.opacity = 1;//show
@@ -1940,14 +2309,67 @@ W3Ex.ibaengine = (function($){
 		{
 			props.duration = anim.ondisspeed;
 			props.easing = anim.ondiseasing;
-			$elem.css({
-				top:anim.top+'px',
-				left:anim.left+'px',
-				transition:'',
-				transform:''
-				});
+			if(anim.onappear == "mixed" || anim.onappear == "vflip" || anim.onappear == "hflip")
+			{
+				var $parent = $elem.parent();
+				var parentid = $parent.attr('id');
+				if(parentid.indexOf('wrap')!=-1)
+				{
+					$elem.css({
+					top:anim.top+'px',
+					left:anim.left+'px'});
+					$elem.unwrap();
+					$('#'+anim.domid + 'second').css({
+						visibility:'hidden'
+						});
+					$('#'+anim.domid + 'second').unwrap();
+					$('#'+anim.domid + 'second').remove();
+				}
+			}else
+			{
+				$elem.css({
+					top:anim.top+'px',
+					left:anim.left+'px',
+					transition:'',
+					transform:''
+					});
+			}
+		
 			
 			switch(anim.ondis){
+				case "mixed":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"mixed","dis");
+					propssecond.duration = anim.ondisspeed;
+					propssecond.easing = anim.ondiseasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+height+'px';
+					props.opacity = 1;//show
+					props.left = width + 'px';
+				}break;
+				case "hflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"hflip","dis");
+					propssecond.duration = anim.ondisspeed;
+					propssecond.easing = anim.ondiseasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+height+'px';
+					props.opacity = 1;//show
+					props.top = topheight+'px';
+				}break;
+				case "vflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"vflip","dis");
+					propssecond.duration = anim.ondisspeed;
+					propssecond.easing = anim.ondiseasing;
+					propssecond.opacity = 1;//show
+					propssecond.left = '-'+width+'px';
+					props.opacity = 1;//show
+					props.left = leftwidth+'px';
+				}break;
 				case "fadeout":
 				{
 					props.opacity = 0;//show
@@ -1976,7 +2398,8 @@ W3Ex.ibaengine = (function($){
 				{
 					props.duration = 10;
 					props.opacity = 0;
-				}break;
+				}
+					break;
 				default:
 					break;
 			}
@@ -1988,6 +2411,11 @@ W3Ex.ibaengine = (function($){
 			anim.state.start = true;
 			anim.state.finish = false;
 			props.delay = anim.delayfor;
+			if(hastwo)
+			{
+				propssecond.delay = anim.delayfor;
+				$('#'+anim.domid + 'second').transition(propssecond);
+			}
 			$elem.transition(props);
 		}
 		else
@@ -1997,12 +2425,21 @@ W3Ex.ibaengine = (function($){
 				props.delay = anim.displayfor;
 				propssecond.delay = anim.displayfor;
 				$elem.transition(props);
+				if(hastwo)
+				{
+					propssecond.delay = anim.displayfor;
+					$('#'+anim.domid + 'second').transition(propssecond);
+				}
 				
 			}else
 			{
 				props.delay = 0;
 				propssecond.delay = 0;
 				$elem.transition(props);
+				if(hastwo)
+				{
+					$('#'+anim.domid + 'second').transition(propssecond);
+				}
 			}
 		}
 	}
@@ -2040,6 +2477,26 @@ W3Ex.ibaengine = (function($){
 						if(AnimItem.afterfin != "loop")
 						{//apply static effect
 							var $elem = AnimItem.domitem;
+						if(AnimItem.onappear == "mixed" || AnimItem.onappear == "vflip" || AnimItem.onappear == "hflip")						{
+								var $secstate = $('#'+AnimItem.domid + 'second');
+								var $parent = $elem.parent();
+								var parentid = $parent.attr('id');
+								if(parentid.indexOf('wrap')!=-1)
+								{
+									$elem.unwrap();
+									$elem.css({
+										top:AnimItem.top+'px',
+										left:AnimItem.left+'px',
+										opacity:1
+									});
+									$secstate.css({
+										visibility:'hidden'
+										});
+									$secstate.unwrap();
+									$secstate.remove();
+								}
+							}
+							setInterval(StaticAnimation,5500,AnimItem.domitem,AnimItem.staticeffect);
 							return;
 						}
 					}
@@ -2047,14 +2504,38 @@ W3Ex.ibaengine = (function($){
 				}else if(AnimItem.state.finish)
 				{//check for next state
 					var $elem = AnimItem.domitem;
-					$elem.css({
-						top:AnimItem.top+'px',
-						left:AnimItem.left+'px',
-						transform:'',
-						transition:'',
-						opacity:0,
-						visibility:'hidden'
-					});
+					if(AnimItem.ondis == "mixed" || AnimItem.ondis == "vflip" || AnimItem.ondis == "hflip")
+					{
+						
+						var $secstate = $('#'+AnimItem.domid + 'second');
+						var $parent = $elem.parent();
+						var parentid = $parent.attr('id');
+						if(parentid.indexOf('wrap')!=-1)
+						{
+							$elem.unwrap();
+							$elem.css({
+								top:AnimItem.top+'px',
+								left:AnimItem.left+'px',
+								opacity:0,
+								visibility:'hidden'
+							});
+							$secstate.css({
+								visibility:'hidden'
+								});
+							$secstate.unwrap();
+							$secstate.remove();
+						}
+					}else
+					{
+						$elem.css({
+							top:AnimItem.top+'px',
+							left:AnimItem.left+'px',
+							transform:'',
+							transition:'',
+							opacity:0,
+							visibility:'hidden'
+						});
+					}
 					var AnimNew;
 					var nextstate = GetNextState(AnimItem); //old if no new state found
 					AnimNew = nextstate.anim;
@@ -2101,7 +2582,7 @@ W3Ex.ibaengine = (function($){
 		AnimItem.ondis =  stateitem.ondisappear;
 		AnimItem.ondiseasing =  stateitem.ondisappeareasing;
 		AnimItem.ondisspeed =   parseInt(stateitem.ondisappearspeed,10);
-		AnimItem.staticeffect =  "none";
+		AnimItem.staticeffect =  stateitem.staticeffect;
 		
 		var layer = _previewob.layer;
 		if(layer.width < AnimItem.width)
@@ -2235,12 +2716,20 @@ W3Ex.ibaengine = (function($){
 			var state = arrstates[i];
 			$('<div style="position: absolute;left:0px;top:0px;display:inline;" data-id="'+state.stateid+'" id="w3_effect'+state.stateid+'-'+_previewob.counter+'" class="w3_effect"></div>').appendTo(_previewob.layer.domitem);
 			var $elem = $('#w3_effect'+state.stateid+'-'+_previewob.counter);
+			if(state.type == "text")
 			{
 				state.text = state.text.replace(new RegExp('\n','g'), '<br />');
 				$elem.html(state.text);
 				
+			}else if(state.type == "html")
+			{
+				var val = state.html;
+				state.html = val.replace(/\\"/g, "\"");
+				$elem.html(state.html);
+			}else
+			{
+				$elem.html('<img src="'+state.imagesrc+'" />');
 			}
-			
 			if(isDefined(state.style))
 			{
 				var style = state.style;

@@ -103,7 +103,13 @@ W3Ex.ibaengine = (function($){
 	
 	function isDefined(x) { return x !== _u;}
 	
-	
+	function StaticAnimation($domitem,anim)
+	{
+		console.log($domitem.attr('id'));
+		$domitem.removeClass(anim + ' animated').addClass(anim + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+  				$domitem.removeClass(anim + ' animated');
+			 });
+	}
 	function getContainer(index)
 	{
 		for(var i=0; i<W3Ex.containers.length; i++)
@@ -112,6 +118,104 @@ W3Ex.ibaengine = (function($){
 			if(container.id == index)
 				return container;
 		}
+	}
+	function buidTwoHalfStates(anim,type,animtype)
+	{
+		var animtype = typeof animtype !== 'undefined' ? animtype : "app";
+		var width = anim.width;
+		var leftwidth = Math.round(width/2);
+		var rightwidth = width - leftwidth;
+		var height = anim.height;
+		var topheight = Math.round(height/2);
+		var botheight = height - topheight;
+		var $elem = anim.domitem;
+		var css = {
+			visibility:"visible",
+			opacity:1,
+			transform:"",
+			left:"0px",
+			top:'0px'
+		}
+		if(animtype == "app")
+		{
+			if(type == "mixed")
+			{
+				css.left = '-'+width+'px';
+			}else if(type == "hflip")
+			{
+				css.top = topheight+'px';
+			}else if(type == "vflip")
+			{
+				css.left = leftwidth+'px';
+			}	
+		}
+		$elem.wrap('<div id="wrap_'+anim.domid+'"></div>');
+		
+				
+		var wrapcss = {
+			position:'absolute',
+			top:anim.top+'px',
+			left:anim.left + 'px',
+			height:topheight+'px',
+			width:anim.width+'px'	,
+			transform:'',
+			overflow:'hidden'
+		}
+		
+		if(type == "vflip")
+		{
+			wrapcss.height = height+'px';
+			wrapcss.width = leftwidth+'px';
+		}	
+		$('#wrap_'+anim.domid).css(wrapcss);	
+		$elem.css(css);
+		
+		$elem.clone().attr('id',anim.domid + 'second').prependTo('#'+anim.layerid);
+		$('#'+anim.domid + 'second').wrap('<div id="wraps_'+anim.domid+'"></div>');
+		var secondstatecss = {
+			opacity:'1',
+			visibility:'visible',
+			left:'0px',
+			top:'-'+height+'px'
+
+		}
+		if(animtype == "app")
+		{
+			if(type == "vflip")
+			{
+				secondstatecss.left = '-'+width+'px';
+				secondstatecss.top = '0px';
+			}	
+		}else
+		{
+			if(type == "mixed" || type == "hflip")
+			{
+				secondstatecss.top = '-'+topheight+'px';
+			}else if(type == "vflip")
+			{
+				secondstatecss.left = '-'+leftwidth+'px';
+				secondstatecss.top = '0px';
+			}	
+		}
+		var secondwrapcss = {
+			position:'absolute',
+			top:(anim.top + topheight)+'px',
+			left:anim.left +'px',
+			height:botheight+'px',
+			width:anim.width+'px'	,
+			transform:'',
+			overflow:'hidden'
+		}
+		if(type == "vflip")
+		{
+			secondwrapcss.left = (anim.left + leftwidth) +'px';
+			secondwrapcss.top = anim.top+'px';
+			secondwrapcss.height = height+'px';
+			secondwrapcss.width = leftwidth+'px';
+		}	
+		$('#wraps_'+anim.domid).css(secondwrapcss);
+		$('#'+anim.domid + 'second').css(secondstatecss);
+		
 	}
 	
 	function animateSingleItem(anim)
@@ -144,6 +248,41 @@ W3Ex.ibaengine = (function($){
 				transition:''
 			});
 			switch(anim.onappear){
+				case "mixed":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"mixed");
+					var topheight = Math.ceil(anim.height/2);
+					propssecond.duration = anim.onappspeed;
+					propssecond.easing = anim.onappeasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+topheight+'px';
+					props.opacity = 1;//show
+					props.left = '0px';
+				}break;
+				case "hflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"hflip");
+					propssecond.duration = anim.onappspeed;
+					propssecond.easing = anim.onappeasing;
+					propssecond.opacity =  1;//show
+					propssecond.top = '-'+topheight+'px';
+					props.opacity =  1;//show
+					props.left = '0px';
+					props.top = '0px';
+				}break;
+				case "vflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"vflip");
+					propssecond.duration = anim.onappspeed;
+					propssecond.easing = anim.onappeasing;
+					propssecond.opacity = 1;//show
+					propssecond.left = '-'+leftwidth+'px';
+					props.opacity =  1;//show
+					props.left = '0px';
+				}break;
 				case "fadein":
 				{
 					props.opacity = 1;//show
@@ -192,14 +331,66 @@ W3Ex.ibaengine = (function($){
 		{
 			props.duration = anim.ondisspeed;
 			props.easing = anim.ondiseasing;
-			$elem.css({
-				top:anim.top+'px',
-				left:anim.left+'px',
-				transition:'',
-				transform:''
-			});
+			if(anim.onappear == "mixed" || anim.onappear == "vflip" || anim.onappear == "hflip")
+			{
+				var $parent = $elem.parent();
+				var parentid = $parent.attr('id');
+				if(parentid.indexOf('wrap')!=-1)
+				{
+					$elem.css({
+					top:anim.top+'px',
+					left:anim.left+'px'});
+					$elem.unwrap();
+					$('#'+anim.domid + 'second').css({
+						visibility:'hidden'
+						});
+					$('#'+anim.domid + 'second').unwrap();
+					$('#'+anim.domid + 'second').remove();
+				}
+			}else
+			{
+				$elem.css({
+					top:anim.top+'px',
+					left:anim.left+'px',
+					transition:'',
+					transform:''
+					});
+			}
 			
 			switch(anim.ondis){
+				case "mixed":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"mixed","dis");
+					propssecond.duration = anim.ondisspeed;
+					propssecond.easing = anim.ondiseasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+height+'px';
+					props.opacity = 1;//show
+					props.left = width + 'px';
+				}break;
+				case "hflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"hflip","dis");
+					propssecond.duration = anim.ondisspeed;
+					propssecond.easing = anim.ondiseasing;
+					propssecond.opacity = 1;//show
+					propssecond.top = '-'+height+'px';
+					props.opacity = 1;//show
+					props.top = topheight+'px';
+				}break;
+				case "vflip":
+				{
+					hastwo = true;
+					buidTwoHalfStates(anim,"vflip","dis");
+					propssecond.duration = anim.ondisspeed;
+					propssecond.easing = anim.ondiseasing;
+					propssecond.opacity = 1;//show
+					propssecond.left = '-'+width+'px';
+					props.opacity = 1;//show
+					props.left = leftwidth+'px';
+				}break;
 				case "fadeout":
 				{
 					props.opacity = 0;//show
@@ -254,9 +445,19 @@ W3Ex.ibaengine = (function($){
 			if(_notmodern)
 			{
 				$elem.animate({},0).delay(anim.delayfor).animate(props,options);
+				if(hastwo)
+				{
+					options.complete = '';
+					$('#'+anim.domid + 'second').animate({},0).delay(anim.delayfor).animate(propssecond,options).delay(anim.displayfor);
+				}
 			}else
 			{
 				props.delay = anim.delayfor;
+				if(hastwo)
+				{
+					propssecond.delay = anim.delayfor;
+					$('#'+anim.domid + 'second').transition(propssecond);
+				}
 				$elem.transition(props);
 			}
 		}
@@ -268,22 +469,41 @@ W3Ex.ibaengine = (function($){
 				{
 					
 					$elem.animate({opacity:1},anim.displayfor).animate(props,options);
+					if(hastwo)
+					{
+						options.complete = '';
+						$('#'+anim.domid + 'second').animate({opacity:1},anim.displayfor).animate(propssecond,options);
+					}
 				}else
 				{
 					props.delay = anim.displayfor;
 					propssecond.delay = anim.displayfor;
 					$elem.transition(props);
+					if(hastwo)
+					{
+						propssecond.delay = anim.displayfor;
+						$('#'+anim.domid + 'second').transition(propssecond);
+					}
 				}
 			}else
 			{
 				if(_notmodern)
 				{
 					$elem.animate(props,options);
+					if(hastwo)
+					{
+						options.complete = '';
+						$('#'+anim.domid + 'second').animate(propssecond,options);
+					}
 				}else
 				{
 					props.delay = 0;
 					propssecond.delay = 0;
 					$elem.transition(props);
+					if(hastwo)
+					{
+						$('#'+anim.domid + 'second').transition(propssecond);
+					}
 				}
 			}
 		}
@@ -321,6 +541,26 @@ W3Ex.ibaengine = (function($){
 						if(AnimItem.afterfin != "loop")
 						{//apply static effect
 							var $elem = AnimItem.domitem;
+						if(AnimItem.onappear == "mixed" || AnimItem.onappear == "vflip" || AnimItem.onappear == "hflip")						{
+								var $secstate = $('#'+AnimItem.domid + 'second');
+								var $parent = $elem.parent();
+								var parentid = $parent.attr('id');
+								if(parentid.indexOf('wrap')!=-1)
+								{
+									$elem.unwrap();
+									$elem.css({
+										top:AnimItem.top+'px',
+										left:AnimItem.left+'px',
+										opacity:1
+									});
+									$secstate.css({
+										visibility:'hidden'
+										});
+									$secstate.unwrap();
+									$secstate.remove();
+								}
+							}
+							setInterval(StaticAnimation,5500,AnimItem.domitem,AnimItem.staticeffect);
 							return;
 						}
 					}
@@ -329,14 +569,37 @@ W3Ex.ibaengine = (function($){
 				{//check for next state
 					
 					var $elem = AnimItem.domitem;
-					$elem.css({
-						top:AnimItem.top+'px',
-						left:AnimItem.left+'px',
-						transform:'',
-						transition:'',
-						opacity:0,
-						visibility:'hidden'
-					});
+					if(AnimItem.ondis == "mixed" || AnimItem.ondis == "vflip" || AnimItem.ondis == "hflip")
+					{
+						var $secstate = $('#'+AnimItem.domid + 'second');
+						var $parent = $elem.parent();
+						var parentid = $parent.attr('id');
+						if(parentid.indexOf('wrap')!=-1)
+						{
+							$elem.unwrap();
+							$elem.css({
+								top:AnimItem.top+'px',
+								left:AnimItem.left+'px',
+								opacity:0,
+								visibility:'hidden'
+							});
+							$secstate.css({
+								visibility:'hidden'
+								});
+							$secstate.unwrap();
+							$secstate.remove();
+						}
+					}else
+					{
+						$elem.css({
+							top:AnimItem.top+'px',
+							left:AnimItem.left+'px',
+							transform:'',
+							transition:'',
+							opacity:0,
+							visibility:'hidden'
+						});
+					}
 					var AnimNew;
 					var nextstate = GetNextState(AnimItem); //old if no new state found
 					AnimNew = nextstate.anim;
@@ -384,7 +647,7 @@ W3Ex.ibaengine = (function($){
 		AnimItem.ondis =  $elem.attr("data-ondis");
 		AnimItem.ondiseasing =  $elem.attr("data-ondiseasing");
 		AnimItem.ondisspeed =   parseInt($elem.attr("data-ondisspeed"),10);
-		AnimItem.staticeffect =  "none";
+		AnimItem.staticeffect =  $elem.attr("data-staticeffect");
 		var layer = GetLayer(AnimItem.layerid);
 		var container = getContainer(layer.containerid);
 		if(layer.width < AnimItem.width)
