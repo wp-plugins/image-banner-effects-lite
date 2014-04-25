@@ -256,6 +256,12 @@ class W3ExIBEffectsMainAdminView{
 							<button id="newtextstate" class="btn btn-primary btn-sm" type="button">
 							<span class="glyphicon glyphicon-font"></span>
 							Text</button>
+							<button id="newhtmlstate" class="btn btn-primary btn-sm" type="button">
+							<span class="glyphicon glyphicon-globe"></span>
+							Html</button>
+							<button id="newimagestate" class="btn btn-primary btn-sm" type="button">
+							<span class="glyphicon glyphicon-picture"></span>
+							Image</button>
 						</div>
 					</div>
 					</div>
@@ -323,6 +329,7 @@ class W3ExIBEffectsMainAdminView{
 									
 								<select id="laststatefin" class="ui-widget ui-state-default ui-corner-all">
 								  <option value="loop">Loop to first state</option>
+								  <option value="stopstatic">Stop and apply static animation</option>
 								  <option value="stop">Stop</option>
 								  </select>
 								<!--</div>-->
@@ -342,6 +349,9 @@ class W3ExIBEffectsMainAdminView{
 								<td>
 								<select id="onappeartype" class="ui-widget ui-state-default ui-corner-all">
 								  <option value="fadein">Fade In</option>
+								  <option value="hflip">Horizontal Flip</option>
+								  <option value="vflip">Vertical Flip</option>
+								  <option value="mixed">Mixed Appear</option>
 								  <option value="top">From Top</option>
 								  <option value="left">From Left</option>
 								  <option value="right">From Right</option>
@@ -366,6 +376,9 @@ class W3ExIBEffectsMainAdminView{
 								<select id="ondisappeartype" class="ui-widget ui-state-default ui-corner-all">
 								  <option value="none">None</option>
 								  <option value="fadeout">Fade Out</option>
+								  <option value="hflip">Horizontal Flip</option>
+								  <option value="vflip">Vertical Flip</option>
+								  <option value="mixed">Mixed Disapp</option>
 								  <option value="top">To Top</option>
 								  <option value="left">To Left</option>
 								  <option value="right">To Right</option>
@@ -381,6 +394,25 @@ class W3ExIBEffectsMainAdminView{
 								</td>
 							</tr>
 							<tr><td colspan="3" style="height:1px;padding:0px;">&nbsp;</td></tr>
+							<tr>
+								<td>
+									Static Effect<br/>
+									/Last state only/
+								</td>
+								<td>
+								  <select id="laststateeffect" class="ui-widget ui-state-default ui-corner-all">
+								      <option value="tada">Tada</option>
+								      <option value="rubber">Rubber band</option>
+									  <option value="shake">Shake</option>
+									  <option value="swing">Swing</option>
+									  <option value="bounce">Bounce</option>
+									  <option value="flash">Flash</option>
+									  <option value="pulse">Pulse</option>
+									  <option value="wobble">Wobble</option>
+								  </select>
+								</td>
+								
+							</tr>
 						</table>
 					</p>
 					</div>
