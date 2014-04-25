@@ -39,7 +39,7 @@ Howtos with screenshots
 Upload the Image Banner Effects Lite plugin to your blog and activate it.
 
 == Changelog ==
-= 1.1 =
+= 1.2 =
 * Html and Image layers
 * Static animations
 = 1.1 =
