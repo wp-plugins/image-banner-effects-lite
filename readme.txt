@@ -3,7 +3,7 @@ Author: GeorgeIron
 Homepage: http://www.w3examples.com
 Donate link: http://www.w3examples.com/donate.php
 Tags: animations, ads, images, media
-Tested up to: 4.1
+Tested up to: 4.2
 Requires at least: 3.5
 Contributors: GeorgeIron
 Stable Tag: trunk
