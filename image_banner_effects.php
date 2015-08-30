@@ -37,7 +37,13 @@ class W3ExImageBannerMain {
     public function _setup()
     {
        $page = add_menu_page("Image Effects","Image Effects","manage_options","ibeffects",array(self::instance(), 'showpage'));  
+//	    add_submenu_page("ibeffects","dsdsdsd","sdsdsdsd","manage_options","ibeffects1",array(self::instance(), 'showpage1'));  
 	   add_action( 'admin_enqueue_scripts', array(self::instance(), 'admin_scripts') );
+    }
+	
+	public function showpage1()
+    {
+        require_once(dirname(__FILE__).'/ibeffects.php');
     }
 	
 	public static function ajax_request()
