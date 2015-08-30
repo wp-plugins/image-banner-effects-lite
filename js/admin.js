@@ -1143,6 +1143,7 @@ W3Ex.ibaengine = (function($){
 				open: function( event, ui ) {
 					 var d = $('.ui-dialog:visible');
 					 $(d).css('z-index',300002);
+					  $('.ui-dialog:visible').wrap('<div class="w3exvtfscope w3exvtfdel" />');
 					  $('.ui-widget-overlay').each(function () {
 	   					 $(this).next('.ui-dialog').andSelf().wrapAll('<div class="w3exvtfscope w3exvtfdel" />');
 						 $('#showdialog').css('height','auto');
